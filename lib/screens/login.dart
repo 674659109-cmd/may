@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:may/screens/login_form.dart';
+import 'package:may/screens/register.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -46,7 +48,7 @@ class LoginScreen extends StatelessWidget {
                 ),
               ),
 
-              // Middle Illustration
+              // Middle Illustration (Architectural & Nature, No People)
               Expanded(
                 child: Center(
                   child: Padding(
@@ -62,7 +64,10 @@ class LoginScreen extends StatelessWidget {
                 height: 52.0,
                 child: ElevatedButton(
                   onPressed: () {
-                    // TODO: Implement login action
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const LoginFormScreen()),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: primaryColor,
@@ -89,7 +94,10 @@ class LoginScreen extends StatelessWidget {
                 height: 52.0,
                 child: OutlinedButton(
                   onPressed: () {
-                    // TODO: Implement register action
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const RegisterScreen()),
+                    );
                   },
                   style: OutlinedButton.styleFrom(
                     backgroundColor: Colors.white,
@@ -227,7 +235,7 @@ class _LogoPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-// Campus Illustration Widget
+// Campus Illustration Widget (Architectural & Nature Landscape, No People)
 class _CampusIllustration extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -254,149 +262,202 @@ class _IllustrationPainter extends CustomPainter {
     final w = size.width;
     final h = size.height;
 
-    // 1. Soft Sky Ambient Glow
+    // 1. Sky & Sun Glow Background
     final skyGlow = const RadialGradient(
-      center: Alignment.topCenter,
-      radius: 1.1,
+      center: Alignment(0.0, -0.2),
+      radius: 1.0,
       colors: [
-        Color(0xFFEDEFFC),
+        Color(0xFFEEF2FF),
         Color(0xFFF9FAFE),
       ],
     ).createShader(Rect.fromLTWH(0, 0, w, h));
 
     canvas.drawRect(Rect.fromLTWH(0, 0, w, h), Paint()..shader = skyGlow);
 
+    // Sun / Soft Backdrop Circle
+    final sunGlow = Paint()
+      ..color = const Color(0xFFE0E7FF).withOpacity(0.6)
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(Offset(w * 0.5, h * 0.35), w * 0.38, sunGlow);
+
     // Decorative Clouds
-    final cloudPaint = Paint()..color = Colors.white.withOpacity(0.7);
-    canvas.drawCircle(Offset(w * 0.18, h * 0.18), w * 0.08, cloudPaint);
-    canvas.drawCircle(Offset(w * 0.25, h * 0.16), w * 0.1, cloudPaint);
-    canvas.drawCircle(Offset(w * 0.78, h * 0.15), w * 0.09, cloudPaint);
-    canvas.drawCircle(Offset(w * 0.85, h * 0.17), w * 0.07, cloudPaint);
+    final cloudPaint = Paint()..color = Colors.white.withOpacity(0.85);
+    _drawCloud(canvas, cloudPaint, Offset(w * 0.15, h * 0.18), w * 0.12);
+    _drawCloud(canvas, cloudPaint, Offset(w * 0.80, h * 0.15), w * 0.14);
 
-    // 2. Far Mountains / Hills Layer
-    final farHillPaint = Paint()..color = const Color(0xFFD3DCF8);
-    final farHill = Path()
-      ..moveTo(0, h * 0.55)
-      ..cubicTo(w * 0.2, h * 0.42, w * 0.4, h * 0.58, w * 0.6, h * 0.48)
-      ..cubicTo(w * 0.8, h * 0.38, w * 0.95, h * 0.52, w, h * 0.48)
+    // Birds in the sky
+    final birdPaint = Paint()
+      ..color = const Color(0xFF818CF8)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.8
+      ..strokeCap = StrokeCap.round;
+
+    _drawBird(canvas, birdPaint, Offset(w * 0.28, h * 0.12), 10);
+    _drawBird(canvas, birdPaint, Offset(w * 0.34, h * 0.09), 8);
+
+    // 2. Far Background Mountains
+    final mountainPaint = Paint()..color = const Color(0xFFD4DCF7);
+    final mPath = Path()
+      ..moveTo(0, h * 0.6)
+      ..cubicTo(w * 0.25, h * 0.45, w * 0.4, h * 0.55, w * 0.6, h * 0.46)
+      ..cubicTo(w * 0.75, h * 0.38, w * 0.9, h * 0.5, w, h * 0.45)
       ..lineTo(w, h)
       ..lineTo(0, h)
       ..close();
-    canvas.drawPath(farHill, farHillPaint);
+    canvas.drawPath(mPath, mountainPaint);
 
-    // 3. Green Trees Background Layer
-    final treeDark = Paint()..color = const Color(0xFF81C784);
-    final treeLight = Paint()..color = const Color(0xFFA5D6A7);
+    // 3. Middle Ground Green Hills & Trees
+    final hillDark = Paint()..color = const Color(0xFF91D796);
+    final hillLight = Paint()..color = const Color(0xFFAFE2B3);
 
-    // Left Trees
-    canvas.drawCircle(Offset(w * 0.12, h * 0.46), w * 0.09, treeDark);
-    canvas.drawCircle(Offset(w * 0.18, h * 0.48), w * 0.07, treeLight);
-
-    // Right Trees
-    canvas.drawCircle(Offset(w * 0.88, h * 0.45), w * 0.1, treeDark);
-    canvas.drawCircle(Offset(w * 0.81, h * 0.47), w * 0.08, treeLight);
-
-    // 4. University Clock Tower & Building (Centerpiece)
-    _drawUniversityBuilding(canvas, w, h);
-
-    // 5. Lawn & Campus Ground Layer
-    final lawnPaint = Paint()..color = const Color(0xFFC8E6C9);
-    final lawnPath = Path()
+    // Left Hill
+    final leftHill = Path()
       ..moveTo(0, h * 0.62)
-      ..quadraticBezierTo(w * 0.5, h * 0.55, w, h * 0.62)
+      ..quadraticBezierTo(w * 0.25, h * 0.52, w * 0.5, h * 0.62)
+      ..lineTo(0, h)
+      ..close();
+    canvas.drawPath(leftHill, hillLight);
+
+    // Right Hill
+    final rightHill = Path()
+      ..moveTo(w * 0.5, h * 0.62)
+      ..quadraticBezierTo(w * 0.75, h * 0.52, w, h * 0.60)
+      ..lineTo(w, h)
+      ..lineTo(w * 0.5, h)
+      ..close();
+    canvas.drawPath(rightHill, hillDark);
+
+    // Background Pine/Round Trees
+    _drawTree(canvas, Offset(w * 0.12, h * 0.5), w * 0.09, const Color(0xFF4CAF50));
+    _drawTree(canvas, Offset(w * 0.20, h * 0.52), w * 0.07, const Color(0xFF66BB6A));
+    _drawTree(canvas, Offset(w * 0.80, h * 0.51), w * 0.08, const Color(0xFF4CAF50));
+    _drawTree(canvas, Offset(w * 0.88, h * 0.49), w * 0.095, const Color(0xFF388E3C));
+
+    // 4. Grand Campus Main Building (Architecture)
+    _drawCampusBuilding(canvas, w, h);
+
+    // 5. Foreground Courtyard, Path & Gardens
+    final courtPaint = Paint()..color = const Color(0xFFC8E6C9);
+    final courtPath = Path()
+      ..moveTo(0, h * 0.68)
+      ..quadraticBezierTo(w * 0.5, h * 0.63, w, h * 0.68)
       ..lineTo(w, h)
       ..lineTo(0, h)
       ..close();
-    canvas.drawPath(lawnPath, lawnPaint);
+    canvas.drawPath(courtPath, courtPaint);
 
-    // Path / Courtyard
-    final pathPaint = Paint()..color = const Color(0xFFE8ECEF);
-    final courtPath = Path()
-      ..moveTo(w * 0.2, h)
-      ..lineTo(w * 0.38, h * 0.6)
-      ..lineTo(w * 0.62, h * 0.6)
-      ..lineTo(w * 0.8, h)
+    // Central Winding Walkway / Paved Path
+    final pathPaint = Paint()..color = const Color(0xFFE4E8FA);
+    final walkway = Path()
+      ..moveTo(w * 0.35, h)
+      ..quadraticBezierTo(w * 0.42, h * 0.75, w * 0.44, h * 0.66)
+      ..lineTo(w * 0.56, h * 0.66)
+      ..quadraticBezierTo(w * 0.58, h * 0.75, w * 0.65, h)
       ..close();
-    canvas.drawPath(courtPath, pathPaint);
+    canvas.drawPath(walkway, pathPaint);
 
-    // 6. Foreground Student Characters (Vector Detailed)
-    _drawFemaleStudent(canvas, w, h);
-    _drawMaleStudent(canvas, w, h);
+    // Courtyard Stairs in front of Building
+    final stairPaint = Paint()..color = const Color(0xFFD0D7F7);
+    for (int i = 0; i < 3; i++) {
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTWH(w * (0.42 - i * 0.015), h * (0.64 + i * 0.008), w * (0.16 + i * 0.03), h * 0.008),
+          const Radius.circular(2),
+        ),
+        stairPaint,
+      );
+    }
+
+    // Street Lamps along the path
+    _drawStreetLamp(canvas, Offset(w * 0.38, h * 0.75), w, h);
+    _drawStreetLamp(canvas, Offset(w * 0.62, h * 0.75), w, h);
+
+    // Flower Bushes in Foreground
+    _drawFlowerBush(canvas, Offset(w * 0.15, h * 0.82), w * 0.08, const Color(0xFF81C784), const Color(0xFFEC407A));
+    _drawFlowerBush(canvas, Offset(w * 0.85, h * 0.82), w * 0.08, const Color(0xFF81C784), const Color(0xFFAB47BC));
+
+    // 6. Subtle Floating Meeting / Status Badges (CampusMeet Theme)
+    _drawFloatingBadge(
+      canvas,
+      Offset(w * 0.22, h * 0.30),
+      Icons.calendar_today_rounded,
+      const Color(0xFF4C52D4),
+    );
+    _drawFloatingBadge(
+      canvas,
+      Offset(w * 0.78, h * 0.28),
+      Icons.chat_bubble_rounded,
+      const Color(0xFF3B82F6),
+    );
   }
 
-  void _drawUniversityBuilding(Canvas canvas, double w, double h) {
-    final wallPaint = Paint()..color = const Color(0xFFC0CEF2);
-    final wallShadow = Paint()..color = const Color(0xFFA5B7E6);
-    final roofPaint = Paint()..color = const Color(0xFF5C6BC0);
-    final windowPaint = Paint()..color = Colors.white;
-    final archPaint = Paint()..color = const Color(0xFF7E57C2);
+  void _drawCloud(Canvas canvas, Paint paint, Offset center, double radius) {
+    canvas.drawCircle(center, radius, paint);
+    canvas.drawCircle(Offset(center.dx - radius * 0.6, center.dy + radius * 0.2), radius * 0.7, paint);
+    canvas.drawCircle(Offset(center.dx + radius * 0.6, center.dy + radius * 0.2), radius * 0.7, paint);
+  }
 
-    // Main Wings (Left & Right)
+  void _drawBird(Canvas canvas, Paint paint, Offset center, double size) {
+    final path = Path()
+      ..moveTo(center.dx - size, center.dy)
+      ..quadraticBezierTo(center.dx - size * 0.5, center.dy - size * 0.6, center.dx, center.dy)
+      ..quadraticBezierTo(center.dx + size * 0.5, center.dy - size * 0.6, center.dx + size, center.dy);
+    canvas.drawPath(path, paint);
+  }
+
+  void _drawTree(Canvas canvas, Offset center, double radius, Color leafColor) {
+    // Trunk
+    final trunkPaint = Paint()..color = const Color(0xFF795548);
+    canvas.drawRect(
+      Rect.fromLTWH(center.dx - radius * 0.15, center.dy, radius * 0.3, radius * 1.2),
+      trunkPaint,
+    );
+    // Foliage
+    final leafPaint = Paint()..color = leafColor;
+    canvas.drawCircle(center, radius, leafPaint);
+    canvas.drawCircle(Offset(center.dx - radius * 0.3, center.dy - radius * 0.2), radius * 0.7, leafPaint);
+    canvas.drawCircle(Offset(center.dx + radius * 0.3, center.dy - radius * 0.2), radius * 0.7, leafPaint);
+  }
+
+  void _drawCampusBuilding(Canvas canvas, double w, double h) {
+    final baseWall = Paint()..color = const Color(0xFFC3D0F5);
+    final mainWall = Paint()..color = const Color(0xFFD6E0FB);
+    final roofColor = Paint()..color = const Color(0xFF4C52D4);
+    final darkRoof = Paint()..color = const Color(0xFF3B40A4);
+    final columnPaint = Paint()..color = Colors.white;
+    final windowPaint = Paint()..color = const Color(0xFFE8EEFF);
+    final doorPaint = Paint()..color = const Color(0xFF3B40A4);
+
+    // Left & Right Building Wings
     canvas.drawRRect(
       RRect.fromRectAndRadius(
-        Rect.fromLTWH(w * 0.22, h * 0.38, w * 0.56, h * 0.24),
-        const Radius.circular(4),
+        Rect.fromLTWH(w * 0.18, h * 0.38, w * 0.64, h * 0.26),
+        const Radius.circular(6),
       ),
-      wallPaint,
+      baseWall,
     );
 
-    // Wing Roofs
-    final leftRoof = Path()
-      ..moveTo(w * 0.20, h * 0.38)
-      ..lineTo(w * 0.36, h * 0.32)
-      ..lineTo(w * 0.38, h * 0.38)
+    // Wing Roofs (Gable Roof)
+    final leftGable = Path()
+      ..moveTo(w * 0.16, h * 0.38)
+      ..lineTo(w * 0.32, h * 0.30)
+      ..lineTo(w * 0.35, h * 0.38)
       ..close();
-    canvas.drawPath(leftRoof, roofPaint);
+    canvas.drawPath(leftGable, roofColor);
 
-    final rightRoof = Path()
-      ..moveTo(w * 0.80, h * 0.38)
-      ..lineTo(w * 0.64, h * 0.32)
-      ..lineTo(w * 0.62, h * 0.38)
+    final rightGable = Path()
+      ..moveTo(w * 0.84, h * 0.38)
+      ..lineTo(w * 0.68, h * 0.30)
+      ..lineTo(w * 0.65, h * 0.38)
       ..close();
-    canvas.drawPath(rightRoof, roofPaint);
-
-    // Central Tower Body
-    canvas.drawRect(Rect.fromLTWH(w * 0.41, h * 0.22, w * 0.18, h * 0.4), wallShadow);
-    canvas.drawRect(Rect.fromLTWH(w * 0.42, h * 0.22, w * 0.16, h * 0.4), wallPaint);
-
-    // Central Spire / Clock Roof
-    final spire = Path()
-      ..moveTo(w * 0.40, h * 0.22)
-      ..lineTo(w * 0.50, h * 0.10)
-      ..lineTo(w * 0.60, h * 0.22)
-      ..close();
-    canvas.drawPath(spire, roofPaint);
-
-    // Tower Clock
-    final clockOuter = Paint()..color = const Color(0xFF3F51B5);
-    final clockFace = Paint()..color = Colors.white;
-    canvas.drawCircle(Offset(w * 0.50, h * 0.28), w * 0.042, clockOuter);
-    canvas.drawCircle(Offset(w * 0.50, h * 0.28), w * 0.035, clockFace);
-
-    // Clock Hands
-    final handPaint = Paint()
-      ..color = const Color(0xFF212121)
-      ..strokeWidth = 2.0
-      ..strokeCap = StrokeCap.round;
-    canvas.drawLine(Offset(w * 0.50, h * 0.28), Offset(w * 0.50, h * 0.26), handPaint);
-    canvas.drawLine(Offset(w * 0.50, h * 0.28), Offset(w * 0.515, h * 0.28), handPaint);
-
-    // Tower Arch Entrance
-    final archRect = Rect.fromLTWH(w * 0.46, h * 0.50, w * 0.08, h * 0.12);
-    final archPath = Path()
-      ..addRRect(RRect.fromRectAndCorners(
-        archRect,
-        topLeft: const Radius.circular(16),
-        topRight: const Radius.circular(16),
-      ));
-    canvas.drawPath(archPath, archPaint);
+    canvas.drawPath(rightGable, roofColor);
 
     // Windows Grid on Wings
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 4; i++) {
       // Left Wing Windows
       canvas.drawRRect(
         RRect.fromRectAndRadius(
-          Rect.fromLTWH(w * (0.25 + i * 0.05), h * 0.42, w * 0.03, h * 0.06),
+          Rect.fromLTWH(w * (0.21 + i * 0.045), h * 0.42, w * 0.03, h * 0.07),
           const Radius.circular(3),
         ),
         windowPaint,
@@ -404,167 +465,128 @@ class _IllustrationPainter extends CustomPainter {
       // Right Wing Windows
       canvas.drawRRect(
         RRect.fromRectAndRadius(
-          Rect.fromLTWH(w * (0.61 + i * 0.05), h * 0.42, w * 0.03, h * 0.06),
+          Rect.fromLTWH(w * (0.61 + i * 0.045), h * 0.42, w * 0.03, h * 0.07),
           const Radius.circular(3),
         ),
         windowPaint,
       );
     }
-  }
 
-  void _drawFemaleStudent(Canvas canvas, double w, double h) {
-    final x = w * 0.26;
-    final y = h * 0.38;
+    // Main Central Hall Body
+    canvas.drawRect(Rect.fromLTWH(w * 0.38, h * 0.26, w * 0.24, h * 0.38), mainWall);
 
-    final skin = Paint()..color = const Color(0xFFFFD8C2);
-    final hair = Paint()..color = const Color(0xFF262836);
-    final shirt = Paint()..color = Colors.white;
-    final skirt = Paint()..color = const Color(0xFF2C3258);
-    final backpack = Paint()..color = const Color(0xFF4C52D4);
-    final tablet = Paint()..color = const Color(0xFF3F51B5);
-
-    // Backpack behind shoulder
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromLTWH(x - w * 0.11, y + h * 0.14, w * 0.08, h * 0.24),
-        const Radius.circular(14),
-      ),
-      backpack,
-    );
-
-    // Hair Back
-    canvas.drawOval(
-      Rect.fromLTWH(x - w * 0.08, y + h * 0.02, w * 0.16, h * 0.22),
-      hair,
-    );
-
-    // Head Face
-    canvas.drawCircle(Offset(x, y + h * 0.08), w * 0.062, skin);
-
-    // Front Hair Bangs
-    final bangs = Path()
-      ..addOval(Rect.fromLTWH(x - w * 0.065, y + h * 0.02, w * 0.13, h * 0.07));
-    canvas.drawPath(bangs, hair);
-
-    // Torso / White Shirt
-    final shirtPath = Path()
-      ..moveTo(x - w * 0.06, y + h * 0.36)
-      ..lineTo(x - w * 0.045, y + h * 0.15)
-      ..lineTo(x + w * 0.05, y + h * 0.15)
-      ..lineTo(x + w * 0.065, y + h * 0.36)
+    // Clock Tower Spire Top
+    final spireRoof = Path()
+      ..moveTo(w * 0.36, h * 0.26)
+      ..lineTo(w * 0.50, h * 0.11)
+      ..lineTo(w * 0.64, h * 0.26)
       ..close();
-    canvas.drawPath(shirtPath, shirt);
+    canvas.drawPath(spireRoof, darkRoof);
 
-    // Backpack Strap Left
-    final strapPaint = Paint()
-      ..color = const Color(0xFF4C52D4)
-      ..strokeWidth = 3.5
-      ..style = PaintingStyle.stroke;
-    canvas.drawLine(Offset(x - w * 0.035, y + h * 0.15), Offset(x - w * 0.045, y + h * 0.3), strapPaint);
+    // Flagpole on Top
+    final flagPolePaint = Paint()
+      ..color = const Color(0xFF9FA8DA)
+      ..strokeWidth = 2.0;
+    canvas.drawLine(Offset(w * 0.5, h * 0.11), Offset(w * 0.5, h * 0.05), flagPolePaint);
 
-    // Skirt
-    final skirtPath = Path()
-      ..moveTo(x - w * 0.06, y + h * 0.36)
-      ..lineTo(x + w * 0.065, y + h * 0.36)
-      ..lineTo(x + w * 0.075, y + h * 0.52)
-      ..lineTo(x - w * 0.07, y + h * 0.52)
+    final flagPath = Path()
+      ..moveTo(w * 0.5, h * 0.05)
+      ..lineTo(w * 0.56, h * 0.07)
+      ..lineTo(w * 0.5, h * 0.09)
       ..close();
-    canvas.drawPath(skirtPath, skirt);
+    canvas.drawPath(flagPath, Paint()..color = const Color(0xFFEF5350));
 
-    // Arms & Tablet Held in Hands
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromLTWH(x - w * 0.01, y + h * 0.20, w * 0.09, h * 0.13),
-        const Radius.circular(6),
-      ),
-      tablet,
-    );
-    // Tablet Screen
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromLTWH(x + w * 0.002, y + h * 0.21, w * 0.068, h * 0.11),
-        const Radius.circular(4),
-      ),
-      Paint()..color = const Color(0xFFE8EAF6),
-    );
+    // Clock Face Center
+    canvas.drawCircle(Offset(w * 0.5, h * 0.33), w * 0.05, darkRoof);
+    canvas.drawCircle(Offset(w * 0.5, h * 0.33), w * 0.04, columnPaint);
 
-    // Hands
-    canvas.drawCircle(Offset(x, y + h * 0.26), w * 0.02, skin);
-    canvas.drawCircle(Offset(x + w * 0.08, y + h * 0.26), w * 0.02, skin);
-  }
-
-  void _drawMaleStudent(Canvas canvas, double w, double h) {
-    final x = w * 0.72;
-    final y = h * 0.38;
-
-    final skin = Paint()..color = const Color(0xFFFFD8C2);
-    final hair = Paint()..color = const Color(0xFF262836);
-    final jacket = Paint()..color = const Color(0xFF2C3258);
-    final innerShirt = Paint()..color = Colors.white;
-    final pants = Paint()..color = const Color(0xFF455A64);
-    final phone = Paint()..color = const Color(0xFF1E2238);
-    final screen = Paint()..color = const Color(0xFF80DEEA);
-
-    // Head Face
-    canvas.drawCircle(Offset(x, y + h * 0.08), w * 0.062, skin);
-
-    // Hair Top
-    final hairPath = Path()
-      ..addRRect(RRect.fromRectAndCorners(
-        Rect.fromLTWH(x - w * 0.065, y + h * 0.015, w * 0.13, h * 0.08),
-        topLeft: const Radius.circular(10),
-        topRight: const Radius.circular(10),
-      ));
-    canvas.drawPath(hairPath, hair);
-
-    // Hoodie / Jacket Body
-    final jacketPath = Path()
-      ..moveTo(x - w * 0.07, y + h * 0.36)
-      ..lineTo(x - w * 0.05, y + h * 0.15)
-      ..lineTo(x + w * 0.06, y + h * 0.15)
-      ..lineTo(x + w * 0.075, y + h * 0.36)
-      ..close();
-    canvas.drawPath(jacketPath, jacket);
-
-    // Inner V-Neck
-    final vNeck = Path()
-      ..moveTo(x - w * 0.025, y + h * 0.15)
-      ..lineTo(x, y + h * 0.24)
-      ..lineTo(x + w * 0.025, y + h * 0.15)
-      ..close();
-    canvas.drawPath(vNeck, innerShirt);
-
-    // Hoodie Drawstrings
-    final stringPaint = Paint()
-      ..color = Colors.white
+    // Clock Hands
+    final clockHand = Paint()
+      ..color = const Color(0xFF1A237E)
       ..strokeWidth = 2.0
-      ..style = PaintingStyle.stroke;
-    canvas.drawLine(Offset(x - w * 0.015, y + h * 0.18), Offset(x - w * 0.015, y + h * 0.27), stringPaint);
-    canvas.drawLine(Offset(x + w * 0.015, y + h * 0.18), Offset(x + w * 0.015, y + h * 0.27), stringPaint);
+      ..strokeCap = StrokeCap.round;
+    canvas.drawLine(Offset(w * 0.5, h * 0.33), Offset(w * 0.5, h * 0.305), clockHand);
+    canvas.drawLine(Offset(w * 0.5, h * 0.33), Offset(w * 0.518, h * 0.33), clockHand);
 
-    // Pants
-    final pantsRect = Rect.fromLTWH(x - w * 0.06, y + h * 0.36, w * 0.125, h * 0.18);
-    canvas.drawRect(pantsRect, pants);
+    // Classic Greek Columns at Grand Entrance
+    for (int i = 0; i < 4; i++) {
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTWH(w * (0.41 + i * 0.05), h * 0.44, w * 0.025, h * 0.18),
+          const Radius.circular(2),
+        ),
+        columnPaint,
+      );
+    }
 
-    // Holding Smartphone
+    // Grand Entrance Door
+    final doorRect = Rect.fromLTWH(w * 0.465, h * 0.52, w * 0.07, h * 0.10);
     canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromLTWH(x - w * 0.05, y + h * 0.20, w * 0.045, h * 0.10),
-        const Radius.circular(5),
+      RRect.fromRectAndCorners(
+        doorRect,
+        topLeft: const Radius.circular(12),
+        topRight: const Radius.circular(12),
       ),
-      phone,
+      doorPaint,
     );
-    // Glowing Phone Screen
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromLTWH(x - w * 0.046, y + h * 0.208, w * 0.037, h * 0.084),
-        const Radius.circular(3),
-      ),
-      screen,
-    );
+  }
 
-    // Hands
-    canvas.drawCircle(Offset(x - w * 0.03, y + h * 0.25), w * 0.018, skin);
+  void _drawStreetLamp(Canvas canvas, Offset pos, double w, double h) {
+    final polePaint = Paint()
+      ..color = const Color(0xFF5C6BC0)
+      ..strokeWidth = 2.5
+      ..strokeCap = StrokeCap.round;
+
+    final glowPaint = Paint()
+      ..color = const Color(0xFFFFF59D).withOpacity(0.8);
+
+    // Pole
+    canvas.drawLine(pos, Offset(pos.dx, pos.dy - h * 0.08), polePaint);
+    // Lamp Light Bulb
+    canvas.drawCircle(Offset(pos.dx, pos.dy - h * 0.085), w * 0.02, glowPaint);
+  }
+
+  void _drawFlowerBush(Canvas canvas, Offset pos, double radius, Color bushColor, Color flowerColor) {
+    final bushPaint = Paint()..color = bushColor;
+    final flowerPaint = Paint()..color = flowerColor;
+
+    canvas.drawCircle(pos, radius, bushPaint);
+    canvas.drawCircle(Offset(pos.dx - radius * 0.4, pos.dy - radius * 0.2), radius * 0.3, flowerPaint);
+    canvas.drawCircle(Offset(pos.dx + radius * 0.4, pos.dy - radius * 0.2), radius * 0.3, flowerPaint);
+    canvas.drawCircle(Offset(pos.dx, pos.dy - radius * 0.5), radius * 0.25, flowerPaint);
+  }
+
+  void _drawFloatingBadge(Canvas canvas, Offset center, IconData icon, Color color) {
+    // Outer Soft Shadow / Glow
+    final shadowPaint = Paint()
+      ..color = color.withOpacity(0.2)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
+    canvas.drawCircle(center, 22, shadowPaint);
+
+    // White Badge Background
+    final bgPaint = Paint()..color = Colors.white;
+    canvas.drawCircle(center, 20, bgPaint);
+
+    // Border
+    final borderPaint = Paint()
+      ..color = color.withOpacity(0.3)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5;
+    canvas.drawCircle(center, 20, borderPaint);
+
+    // Icon rendering inside badge
+    final TextPainter textPainter = TextPainter(textDirection: TextDirection.ltr);
+    textPainter.text = TextSpan(
+      text: String.fromCharCode(icon.codePoint),
+      style: TextStyle(
+        fontSize: 20.0,
+        fontFamily: icon.fontFamily,
+        package: icon.fontPackage,
+        color: color,
+      ),
+    );
+    textPainter.layout();
+    textPainter.paint(canvas, Offset(center.dx - textPainter.width / 2, center.dy - textPainter.height / 2));
   }
 
   @override
