@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:may/models/user_data.dart';
+import 'package:may/screens/appointment_detail.dart';
+import 'package:may/screens/campus_map.dart';
 import 'package:may/screens/create_appointment.dart';
+import 'package:may/screens/history.dart';
 import 'package:may/screens/login.dart';
+import 'package:may/screens/notifications.dart';
 import 'package:may/screens/profile.dart';
+import 'package:may/screens/room_booking.dart';
 import 'package:may/screens/schedule.dart';
 import 'package:may/screens/search_lecturer.dart';
 
@@ -42,8 +48,9 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             icon: const Icon(Icons.notifications_none_rounded, color: Color(0xFF2D3748), size: 26),
             onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('คุณไม่มีการแจ้งเตือนใหม่')),
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const NotificationsScreen()),
               );
             },
           ),
@@ -108,9 +115,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'สวัสดี, นักศึกษา 👋',
-                      style: TextStyle(
+                    Text(
+                      'สวัสดี, ${UserData.name} 👋',
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 22.0,
                         fontWeight: FontWeight.bold,
@@ -118,10 +125,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(height: 6.0),
                     const Text(
-                      'มหาวิทยาลัยราชภัฏเพชรบุรี',
+                      'คณะวิศวกรรมศาสตร์และเทคโนโลยีอุตสาหกรรม มรภ.เพชรบุรี',
                       style: TextStyle(
                         color: Color(0xFFE0E5FF),
-                        fontSize: 14.0,
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                     const SizedBox(height: 16.0),
@@ -162,7 +170,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(height: 28.0),
 
-              // Menu Grid
+              // Menu Grid Row 1
               const Text(
                 'เมนูด่วน',
                 style: TextStyle(
@@ -221,6 +229,37 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
+              const SizedBox(height: 16.0),
+
+              // Menu Grid Row 2
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  _buildMenuItem(
+                    icon: Icons.meeting_room_outlined,
+                    title: 'จองห้องแล็บ',
+                    color: const Color(0xFFD69E2E),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const RoomBookingScreen()),
+                      );
+                    },
+                  ),
+                  const SizedBox(width: 24),
+                  _buildMenuItem(
+                    icon: Icons.map_outlined,
+                    title: 'แผนที่อาคาร',
+                    color: const Color(0xFF805AD5),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const CampusMapScreen()),
+                      );
+                    },
+                  ),
+                ],
+              ),
               const SizedBox(height: 28.0),
 
               // Upcoming Appointments Section
@@ -250,25 +289,39 @@ class _HomeScreenState extends State<HomeScreen> {
 
               // Appointment Card 1
               _buildAppointmentCard(
-                title: 'นัดพบอาจารย์ที่ปรึกษา',
-                subtitle: 'ปรึกษาเรื่องหัวข้อภาคนิพนธ์',
-                location: 'อาคาร 15 ชั้น 4 ห้อง 402',
-                time: 'วันนี้ • 10:30 - 11:30 น.',
-                statusText: 'ยืนยันแล้ว',
-                statusColor: const Color(0xFF38A169),
-                statusBg: const Color(0xFFC6F6D5),
+                context: context,
+                appointment: {
+                  'title': 'นัดพบอาจารย์ที่ปรึกษา',
+                  'person': 'ผศ.ดร.วิศวกรรม นวัตกรรม',
+                  'major': 'วิศวกรรมสารสนเทศและการสื่อสาร',
+                  'location': 'อาคารวิศวกรรมศาสตร์ ชั้น 3 ห้อง 302',
+                  'date': 'วันนี้ (24 พ.ค.)',
+                  'time': '10:30 - 11:30 น.',
+                  'topic': 'ขอปรึกษาหัวข้อโครงงานวิจัยและวิศวกรรมซอฟต์แวร์',
+                  'status': 'CONFIRMED',
+                  'statusText': 'ยืนยันแล้ว',
+                  'statusColor': const Color(0xFF38A169),
+                  'statusBg': const Color(0xFFC6F6D5),
+                },
               ),
               const SizedBox(height: 12.0),
 
               // Appointment Card 2
               _buildAppointmentCard(
-                title: 'นัดติวกลุ่มกับเพื่อน',
-                subtitle: 'ทบทวนสอบกลางภาควิชา Mobile App',
-                location: 'อาคารโดมเรียนรู้ (Learning Center)',
-                time: 'วันนี้ • 13:30 - 15:00 น.',
-                statusText: 'รอดำเนินการ',
-                statusColor: const Color(0xFFDD6B20),
-                statusBg: const Color(0xFFFEEBC8),
+                context: context,
+                appointment: {
+                  'title': 'นัดติวกลุ่มกับเพื่อน',
+                  'person': 'กลุ่มเพื่อนนักศึกษา',
+                  'major': 'วิศวกรรมสารสนเทศและการสื่อสาร',
+                  'location': 'อาคารโดมเรียนรู้ (Learning Center)',
+                  'date': 'วันนี้ (24 พ.ค.)',
+                  'time': '13:30 - 15:00 น.',
+                  'topic': 'ทบทวนสอบกลางภาควิชา Mobile Application Design',
+                  'status': 'PENDING',
+                  'statusText': 'รอดำเนินการ',
+                  'statusColor': const Color(0xFFDD6B20),
+                  'statusBg': const Color(0xFFFEEBC8),
+                },
               ),
             ],
           ),
@@ -288,7 +341,7 @@ class _HomeScreenState extends State<HomeScreen> {
           } else if (index == 2) {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const ScheduleScreen()),
+              MaterialPageRoute(builder: (context) => const HistoryScreen()),
             );
           } else if (index == 3) {
             Navigator.push(
@@ -356,93 +409,98 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildAppointmentCard({
-    required String title,
-    required String subtitle,
-    required String location,
-    required String time,
-    required String statusText,
-    required Color statusColor,
-    required Color statusBg,
+    required BuildContext context,
+    required Map<String, dynamic> appointment,
   }) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16.0),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AppointmentDetailScreen(appointment: appointment),
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1A202C),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: statusBg,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Text(
-                  statusText,
-                  style: TextStyle(
-                    color: statusColor,
-                    fontSize: 12.0,
+        );
+      },
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16.0),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  appointment['title'],
+                  style: const TextStyle(
+                    fontSize: 16.0,
                     fontWeight: FontWeight.bold,
+                    color: Color(0xFF1A202C),
                   ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          Text(
-            subtitle,
-            style: const TextStyle(
-              fontSize: 14.0,
-              color: Color(0xFF718096),
-            ),
-          ),
-          const Divider(height: 24, thickness: 0.8),
-          Row(
-            children: [
-              const Icon(Icons.location_on_outlined, size: 18, color: Color(0xFF4C52D4)),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Text(
-                  location,
-                  style: const TextStyle(fontSize: 13.0, color: Color(0xFF4A5568)),
-                  overflow: TextOverflow.ellipsis,
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: appointment['statusBg'],
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    appointment['statusText'],
+                    style: TextStyle(
+                      color: appointment['statusColor'],
+                      fontSize: 12.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              appointment['person'],
+              style: const TextStyle(
+                fontSize: 14.0,
+                color: Color(0xFF718096),
               ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Row(
-            children: [
-              const Icon(Icons.access_time_rounded, size: 18, color: Color(0xFF4C52D4)),
-              const SizedBox(width: 6),
-              Text(
-                time,
-                style: const TextStyle(fontSize: 13.0, color: Color(0xFF4A5568)),
-              ),
-            ],
-          ),
-        ],
+            ),
+            const Divider(height: 24, thickness: 0.8),
+            Row(
+              children: [
+                const Icon(Icons.location_on_outlined, size: 18, color: Color(0xFF4C52D4)),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    appointment['location'],
+                    style: const TextStyle(fontSize: 13.0, color: Color(0xFF4A5568)),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Row(
+              children: [
+                const Icon(Icons.access_time_rounded, size: 18, color: Color(0xFF4C52D4)),
+                const SizedBox(width: 6),
+                Text(
+                  '${appointment['date']} • ${appointment['time']}',
+                  style: const TextStyle(fontSize: 13.0, color: Color(0xFF4A5568)),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:may/models/user_data.dart';
 import 'package:may/screens/login_form.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -16,19 +17,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
-  String _selectedFaculty = 'คณะเทคโนโลยีสารสนเทศ';
+  String _selectedMajor = 'สาขาวิชาวิศวกรรมสารสนเทศและการสื่อสาร';
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
 
-  final List<String> _pbruFaculties = [
-    'คณะเทคโนโลยีสารสนเทศ',
-    'คณะวิทยาการจัดการ',
-    'คณะครุศาสตร์',
-    'คณะมนุษยศาสตร์และสังคมศาสตร์',
-    'คณะวิทยาศาสตร์และเทคโนโลยี',
-    'คณะเทคโนโลยีการเกษตร',
-    'คณะพยาบาลศาสตร์และวิทยาศาสตร์สุขภาพ',
-    'คณะวิศวกรรมศาสตร์และเทคโนโลยีอุตสาหกรรม',
+  final List<String> _engineeringMajors = [
+    'สาขาวิชาวิศวกรรมเครื่องกล',
+    'สาขาวิชาวิศวกรรมพลังงาน',
+    'สาขาวิชาวิศวกรรมสารสนเทศและการสื่อสาร',
+    'สาขาวิชาวิศวกรรมไฟฟ้า',
+    'สาขาวิชาวิศวกรรมอุตสาหการ',
+    'สาขาวิชาสถาปัตยกรรมภายใน',
   ];
 
   @override
@@ -43,6 +42,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   void _handleRegister() {
     if (_formKey.currentState!.validate()) {
+      setState(() {
+        UserData.name = _nameController.text.trim();
+        UserData.studentId = _studentIdController.text.trim();
+        UserData.email = _emailController.text.trim();
+        UserData.major = _selectedMajor;
+      });
+
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -54,7 +60,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               Text('ลงทะเบียนสำเร็จ'),
             ],
           ),
-          content: Text('สังกัด: $_selectedFaculty\nบัญชีผู้ใช้ของคุณถูกสร้างเรียบร้อยแล้ว กรุณาเข้าสู่ระบบ'),
+          content: Text('คณะวิศวกรรมศาสตร์และเทคโนโลยีอุตสาหกรรม\n$_selectedMajor\n\nบัญชีผู้ใช้ของคุณถูกสร้างเรียบร้อยแล้ว กรุณาเข้าสู่ระบบ'),
           actions: [
             TextButton(
               onPressed: () {
@@ -176,13 +182,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 const SizedBox(height: 8.0),
                 const Text(
-                  'สร้างบัญชีใหม่สำหรับนักศึกษาและบุคลากร มรภ.เพชรบุรี',
+                  'คณะวิศวกรรมศาสตร์และเทคโนโลยีอุตสาหกรรม มรภ.เพชรบุรี',
                   style: TextStyle(
-                    fontSize: 15.0,
-                    color: Color(0xFF6C727F),
+                    fontSize: 14.5,
+                    color: primaryColor,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-                const SizedBox(height: 28.0),
+                const SizedBox(height: 24.0),
 
                 _buildTextField(
                   label: 'ชื่อ-นามสกุล',
@@ -208,9 +215,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   validator: (v) => (v == null || !v.contains('@')) ? 'กรุณากรอกอีเมลให้ถูกต้อง' : null,
                 ),
 
-                // Faculty Dropdown Selector
+                // Major Selector for Faculty of Engineering
                 const Text(
-                  'คณะ / หน่วยงานสังกัด',
+                  'เลือกสาขาวิชา',
                   style: TextStyle(
                     fontSize: 15.0,
                     fontWeight: FontWeight.w600,
@@ -219,10 +226,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 const SizedBox(height: 8.0),
                 DropdownButtonFormField<String>(
-                  value: _selectedFaculty,
+                  value: _selectedMajor,
                   isExpanded: true,
                   decoration: InputDecoration(
-                    prefixIcon: const Icon(Icons.school_outlined, color: primaryColor),
+                    prefixIcon: const Icon(Icons.engineering_outlined, color: primaryColor),
                     filled: true,
                     fillColor: Colors.white,
                     contentPadding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
@@ -239,12 +246,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       borderSide: const BorderSide(color: primaryColor, width: 1.8),
                     ),
                   ),
-                  items: _pbruFaculties
-                      .map((fac) => DropdownMenuItem(
-                            value: fac,
+                  items: _engineeringMajors
+                      .map((major) => DropdownMenuItem(
+                            value: major,
                             child: Text(
-                              fac,
-                              style: const TextStyle(fontSize: 14.0),
+                              major,
+                              style: const TextStyle(fontSize: 13.5),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ))
@@ -252,7 +259,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   onChanged: (val) {
                     if (val != null) {
                       setState(() {
-                        _selectedFaculty = val;
+                        _selectedMajor = val;
                       });
                     }
                   },
