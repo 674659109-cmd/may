@@ -125,12 +125,13 @@ class LoginScreen extends StatelessWidget {
 
               // Footer Text
               const Text(
-                'มหาวิทยาลัยราชภัฏเพชรบุรี',
+                'คณะวิศวกรรมศาสตร์และเทคโนโลยีอุตสาหกรรม มรภ.เพชรบุรี',
                 style: TextStyle(
-                  fontSize: 15.0,
+                  fontSize: 14.0,
                   color: footerColor,
                   fontWeight: FontWeight.w500,
                 ),
+                textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8.0),
             ],

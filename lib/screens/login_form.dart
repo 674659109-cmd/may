@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:may/models/user_data.dart';
 import 'package:may/screens/home.dart';
 import 'package:may/screens/register.dart';
 
@@ -24,6 +25,22 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
 
   void _handleLogin() {
     if (_formKey.currentState!.validate()) {
+      final input = _usernameController.text.trim();
+      if (input.isNotEmpty) {
+        if (input.contains('@')) {
+          UserData.email = input;
+          final parts = input.split('@');
+          if (parts.isNotEmpty && parts.first.isNotEmpty) {
+            UserData.studentId = parts.first;
+          }
+        } else {
+          UserData.studentId = input;
+          if (UserData.email.isEmpty) {
+            UserData.email = '$input@pbru.ac.th';
+          }
+        }
+      }
+
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => const HomeScreen()),
@@ -65,9 +82,9 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
                 ),
                 const SizedBox(height: 8.0),
                 const Text(
-                  'กรอกรหัสนักศึกษาหรืออีเมล เพื่อเข้าสู่ระบบ CampusMeet',
+                  'เข้าสู่ระบบ คณะวิศวกรรมศาสตร์และเทคโนโลยีอุตสาหกรรม มรภ.เพชรบุรี',
                   style: TextStyle(
-                    fontSize: 15.0,
+                    fontSize: 14.5,
                     color: Color(0xFF6C727F),
                   ),
                 ),

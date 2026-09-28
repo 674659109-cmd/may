@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:may/models/user_data.dart';
+import 'package:may/screens/edit_profile.dart';
+import 'package:may/screens/help_center.dart';
 import 'package:may/screens/login.dart';
+import 'package:may/screens/settings.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     const primaryColor = Color(0xFF4C52D4);
@@ -51,37 +60,90 @@ class ProfileScreen extends StatelessWidget {
                           backgroundColor: primaryColor.withOpacity(0.12),
                           child: const Icon(Icons.person_rounded, color: primaryColor, size: 56),
                         ),
-                        const Positioned(
+                        Positioned(
                           bottom: 0,
                           right: 0,
-                          child: CircleAvatar(
-                            radius: 15,
-                            backgroundColor: primaryColor,
-                            child: Icon(Icons.edit_rounded, color: Colors.white, size: 16),
+                          child: GestureDetector(
+                            onTap: () async {
+                              final updated = await Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const EditProfileScreen()),
+                              );
+                              if (updated == true) {
+                                setState(() {});
+                              }
+                            },
+                            child: const CircleAvatar(
+                              radius: 15,
+                              backgroundColor: primaryColor,
+                              child: Icon(Icons.edit_rounded, color: Colors.white, size: 16),
+                            ),
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 14),
-                    const Text(
-                      'นายสมชาย ใจดี',
-                      style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold, color: Color(0xFF1A202C)),
+                    Text(
+                      UserData.name,
+                      style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold, color: Color(0xFF1A202C)),
                     ),
                     const SizedBox(height: 4),
-                    const Text(
-                      'รหัสนักศึกษา: 6512345678',
-                      style: TextStyle(fontSize: 14.0, color: Color(0xFF718096), fontWeight: FontWeight.w500),
+                    Text(
+                      'รหัสนักศึกษา: ${UserData.studentId}',
+                      style: const TextStyle(fontSize: 14.5, color: Color(0xFF4A5568), fontWeight: FontWeight.bold),
                     ),
-                    const SizedBox(height: 4),
-                    const Text(
-                      'คณะเทคโนโลยีสารสนเทศ • สาขาวิชาวิทยาการคอมพิวเตอร์',
-                      style: TextStyle(fontSize: 13.0, color: primaryColor, fontWeight: FontWeight.w600),
+                    const SizedBox(height: 2),
+                    Text(
+                      UserData.email,
+                      style: const TextStyle(fontSize: 13.5, color: Color(0xFF718096), fontWeight: FontWeight.w500),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      '${UserData.faculty}\n${UserData.major}',
+                      style: const TextStyle(fontSize: 13.0, color: primaryColor, fontWeight: FontWeight.w600, height: 1.3),
                       textAlign: TextAlign.center,
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 24.0),
+
+              // Account Details List
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.04),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    _buildInfoTile(
+                      icon: Icons.card_membership_rounded,
+                      title: 'รหัสนักศึกษา',
+                      value: UserData.studentId,
+                    ),
+                    const Divider(height: 1, indent: 56),
+                    _buildInfoTile(
+                      icon: Icons.email_rounded,
+                      title: 'อีเมล',
+                      value: UserData.email,
+                    ),
+                    const Divider(height: 1, indent: 56),
+                    _buildInfoTile(
+                      icon: Icons.school_rounded,
+                      title: 'สาขาวิชา',
+                      value: UserData.major,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20.0),
 
               // Account Options List
               Container(
@@ -101,25 +163,37 @@ class ProfileScreen extends StatelessWidget {
                     _buildOptionTile(
                       icon: Icons.person_outline_rounded,
                       title: 'แก้ไขข้อมูลส่วนตัว',
-                      onTap: () {},
+                      onTap: () async {
+                        final updated = await Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const EditProfileScreen()),
+                        );
+                        if (updated == true) {
+                          setState(() {});
+                        }
+                      },
                     ),
                     const Divider(height: 1, indent: 56),
                     _buildOptionTile(
-                      icon: Icons.notifications_none_rounded,
-                      title: 'ตั้งค่าการแจ้งเตือน',
-                      onTap: () {},
-                    ),
-                    const Divider(height: 1, indent: 56),
-                    _buildOptionTile(
-                      icon: Icons.security_rounded,
-                      title: 'ความปลอดภัย & รหัสผ่าน',
-                      onTap: () {},
+                      icon: Icons.settings_outlined,
+                      title: 'การตั้งค่าแอปพลิเคชัน',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const SettingsScreen()),
+                        );
+                      },
                     ),
                     const Divider(height: 1, indent: 56),
                     _buildOptionTile(
                       icon: Icons.help_outline_rounded,
                       title: 'ศูนย์ช่วยเหลือ & ติดต่อผู้ดูแลระบบ',
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const HelpCenterScreen()),
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -150,6 +224,14 @@ class ProfileScreen extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildInfoTile({required IconData icon, required String title, required String value}) {
+    return ListTile(
+      leading: Icon(icon, color: const Color(0xFF4C52D4)),
+      title: Text(title, style: const TextStyle(fontSize: 13.0, color: Color(0xFF718096))),
+      subtitle: Text(value, style: const TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: Color(0xFF2D3748))),
     );
   }
 

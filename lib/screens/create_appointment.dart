@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 
 class CreateAppointmentScreen extends StatefulWidget {
-  const CreateAppointmentScreen({super.key});
+  final String? initialMajor;
+  final String? initialLecturer;
+
+  const CreateAppointmentScreen({
+    super.key,
+    this.initialMajor,
+    this.initialLecturer,
+  });
 
   @override
   State<CreateAppointmentScreen> createState() => _CreateAppointmentScreenState();
@@ -10,70 +17,89 @@ class CreateAppointmentScreen extends StatefulWidget {
 class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
   final _formKey = GlobalKey<FormState>();
   String _appointmentType = 'นัดพบอาจารย์ที่ปรึกษา';
-  String _selectedFaculty = 'คณะเทคโนโลยีสารสนเทศ';
+  late String _selectedMajor;
   String? _selectedLecturer;
   DateTime _selectedDate = DateTime.now().add(const Duration(days: 1));
   TimeOfDay _selectedTime = const TimeOfDay(hour: 10, minute: 30);
-  final _locationController = TextEditingController(text: 'อาคาร 15 ชั้น 4 ห้อง 402');
+  final _locationController = TextEditingController(text: 'อาคารวิศวกรรมศาสตร์ ชั้น 3 ห้อง 302');
   final _topicController = TextEditingController();
 
   final List<String> _types = [
     'นัดพบอาจารย์ที่ปรึกษา',
-    'นัดปรึกษาเรื่องเรียน/ภาคนิพนธ์',
+    'นัดปรึกษาเรื่องโปรเจกต์/ภาคนิพนธ์',
     'นัดติวกลุ่มเพื่อนนักศึกษา',
-    'นัดติดต่องานทะเบียน/สำนักส่งเสริม',
+    'นัดใช้งานห้องปฏิบัติการ/เครื่องมือวิศวกรรม',
   ];
 
-  final List<String> _faculties = [
-    'คณะเทคโนโลยีสารสนเทศ',
-    'คณะวิทยาการจัดการ',
-    'คณะครุศาสตร์',
-    'คณะมนุษยศาสตร์และสังคมศาสตร์',
-    'คณะวิทยาศาสตร์และเทคโนโลยี',
-    'คณะเทคโนโลยีการเกษตร',
-    'คณะพยาบาลศาสตร์และวิทยาศาสตร์สุขภาพ',
-    'คณะวิศวกรรมศาสตร์และเทคโนโลยีอุตสาหกรรม',
+  final List<String> _engineeringMajors = [
+    'วิศวกรรมไฟฟ้า',
+    'วิศวกรรมพลังงาน',
+    'วิศวกรรมเครื่องกล',
+    'วิศวกรรมอุตสาหการ',
+    'สาขาสถาปัตยกรรมภายใน',
+    'วิศวกรรมสารสนเทศและการสื่อสาร',
   ];
 
-  final Map<String, List<String>> _lecturersByFaculty = {
-    'คณะเทคโนโลยีสารสนเทศ': [
-      'อ.ดร.สมศักดิ์ วิชาการ',
-      'ผศ.ประเสริฐ รู้จริง',
+  final Map<String, List<String>> _lecturersByMajor = {
+    'วิศวกรรมไฟฟ้า': [
+      'ผศ.อนุรักษ์ เกษวัฒนากุล',
+      'อ.บุรีรักษ์ สังข์คงเมือง',
+      'อ.กมลวรรณ วงศ์วุฒิ',
+      'ผศ.ดร.ราเชณ คณะนา',
+      'ผศ.ดร.วิโรจน์ จงชนะชววัฒน์',
     ],
-    'คณะวิทยาการจัดการ': [
-      'ผศ.ดร.วิภาดา สอนดี',
-      'อ.ณรงค์ บริหารงาน',
+    'วิศวกรรมพลังงาน': [
+      'อ.เจิมธง ปรารถนารักษ์ (ประธานหลักสูตร)',
+      'ผศ.ดร.กังสดาล สกุลพงษ์มาลี',
+      'อ.ดร.จุติพร อินทะนิน',
+      'อ.ชลีดล อินยาศรี',
+      'อ.ปองพล รักการงาน',
     ],
-    'คณะครุศาสตร์': [
-      'อ.กิตติศักดิ์ มั่นคง',
-      'ผศ.ปัญญา สั่งสอน',
+    'วิศวกรรมเครื่องกล': [
+      'ผศ.ดร.ช่วงชัย ชุปวา (ประธานสาขาวิชา)',
+      'ผศ.ดร.อนุชา สายสร้อย',
+      'ผศ.ดร.ขวัญชัย หนาแน่น',
+      'ผศ.ดร.พิเชฐ นิลดวงดี',
+      'ผศ.ดร.ปรัชญา มุขดา',
+      'รศ.ดร.อุทัย ผ่องรัศมี (ประธานสาขาฯ ป.โท)',
+      'อ.ชยุต พลอยจิรภาส',
+      'อ.ดวงฤดี ชูตระกูล',
     ],
-    'คณะมนุษยศาสตร์และสังคมศาสตร์': [
-      'ดร.อนันต์ มนุษยศิลป์',
-      'อ.วรรณา ภาษาไทย',
+    'วิศวกรรมอุตสาหการ': [
+      'อ.ประเสริฐ ปราชญ์ประยูร (ประธานสาขาวิชา)',
+      'อ.อลงกรณ์ ฉัตรเมืองปัก',
+      'อ.ชลาลัย วงเวียน',
     ],
-    'คณะวิทยาศาสตร์และเทคโนโลยี': [
-      'ผศ.ดร.สมชาย วิทยา',
-      'ดร.สิริมา ชีววิทยา',
+    'สาขาสถาปัตยกรรมภายใน': [
+      'ผศ.วิเชียร เข็มเงิน (ประธานสาขาวิชา)',
+      'อ.เฉลิมศักดิ์ แก้วเกาะ',
+      'อ.จิตราพร ชัยเสริมวงศ์',
+      'อ.จิตรา มีทองคำ',
+      'อ.ภัทรวรรณ เอมกมล',
+      'อ.จตุพล อังศุเวช',
     ],
-    'คณะเทคโนโลยีการเกษตร': [
-      'อ.ดร.เกษตร เกษตรกรรม',
-      'ผศ.สมพงษ์ พืชพรรณ',
-    ],
-    'คณะพยาบาลศาสตร์และวิทยาศาสตร์สุขภาพ': [
-      'ผศ.พยาบาล นุ่มนวล',
-      'อ.ดร.อรพินท์ สุขภาพดี',
-    ],
-    'คณะวิศวกรรมศาสตร์และเทคโนโลยีอุตสาหกรรม': [
-      'อ.ช่างกล ช่างคิด',
-      'ผศ.ดร.วิศวกรรม นวัตกรรม',
+    'วิศวกรรมสารสนเทศและการสื่อสาร': [
+      'ผศ.กฤษณ์ ไชยวงศ์ (ประธานสาขาวิชา)',
+      'ผศ.ดร.ปาณิศา แก้วสวัสดิ์',
+      'อ.ดร.กิตติพงศ์ นวลใย',
+      'อ.ดร.ดวงกมล อังอำนวยศิริ',
+      'อ.ดร.ประกิจ อินทะชัย',
     ],
   };
 
   @override
   void initState() {
     super.initState();
-    _selectedLecturer = _lecturersByFaculty[_selectedFaculty]!.first;
+    _selectedMajor = (widget.initialMajor != null && _engineeringMajors.contains(widget.initialMajor))
+        ? widget.initialMajor!
+        : 'วิศวกรรมสารสนเทศและการสื่อสาร';
+
+    final available = _lecturersByMajor[_selectedMajor] ?? [];
+    if (widget.initialLecturer != null && available.contains(widget.initialLecturer)) {
+      _selectedLecturer = widget.initialLecturer!;
+    } else {
+      _selectedLecturer = available.isNotEmpty ? available.first : null;
+    }
   }
 
   @override
@@ -142,7 +168,7 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
               Text('ส่งคำขอนัดหมายแล้ว'),
             ],
           ),
-          content: Text('ส่งคำขอนัดหมายไปที่: $_selectedLecturer ($_selectedFaculty) เรียบร้อยแล้ว'),
+          content: Text('ส่งคำขอนัดหมายไปที่: $_selectedLecturer\nสาขา$_selectedMajor\nคณะวิศวกรรมศาสตร์ฯ เรียบร้อยแล้ว'),
           actions: [
             TextButton(
               onPressed: () {
@@ -160,7 +186,7 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
   @override
   Widget build(BuildContext context) {
     const primaryColor = Color(0xFF4C52D4);
-    final availableLecturers = _lecturersByFaculty[_selectedFaculty] ?? [];
+    final availableLecturers = _lecturersByMajor[_selectedMajor] ?? [];
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFE),
@@ -184,6 +210,30 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Faculty Header Badge
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12.0),
+                  decoration: BoxDecoration(
+                    color: primaryColor.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(12.0),
+                    border: Border.all(color: primaryColor.withOpacity(0.2)),
+                  ),
+                  child: const Row(
+                    children: [
+                      Icon(Icons.engineering_rounded, color: primaryColor),
+                      SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          'คณะวิศวกรรมศาสตร์และเทคโนโลยีอุตสาหกรรม มรภ.เพชรบุรี',
+                          style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold, fontSize: 13.0),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20.0),
+
                 // Type Selector
                 const Text(
                   'ประเภทการนัดหมาย',
@@ -206,14 +256,14 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
                 ),
                 const SizedBox(height: 20.0),
 
-                // Faculty Selector
+                // Major Selector
                 const Text(
-                  'เลือกคณะสังกัด',
+                  'เลือกสาขาวิชา',
                   style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: Color(0xFF2D3748)),
                 ),
                 const SizedBox(height: 8.0),
                 DropdownButtonFormField<String>(
-                  value: _selectedFaculty,
+                  value: _selectedMajor,
                   isExpanded: true,
                   decoration: InputDecoration(
                     prefixIcon: const Icon(Icons.school_outlined, color: primaryColor),
@@ -222,21 +272,21 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(14.0), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
                     enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14.0), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
                   ),
-                  items: _faculties.map((fac) => DropdownMenuItem(value: fac, child: Text(fac, style: const TextStyle(fontSize: 14.0), overflow: TextOverflow.ellipsis))).toList(),
+                  items: _engineeringMajors.map((major) => DropdownMenuItem(value: major, child: Text(major, style: const TextStyle(fontSize: 13.5), overflow: TextOverflow.ellipsis))).toList(),
                   onChanged: (val) {
                     if (val != null) {
                       setState(() {
-                        _selectedFaculty = val;
-                        _selectedLecturer = _lecturersByFaculty[val]?.first;
+                        _selectedMajor = val;
+                        _selectedLecturer = _lecturersByMajor[val]?.first;
                       });
                     }
                   },
                 ),
                 const SizedBox(height: 20.0),
 
-                // Lecturer Selector Filtered by Faculty
+                // Lecturer Selector Filtered by Major
                 const Text(
-                  'นัดหมายกับ (อาจารย์ / บุคลากร)',
+                  'นัดหมายกับ (อาจารย์ประจำสาขาวิชา)',
                   style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: Color(0xFF2D3748)),
                 ),
                 const SizedBox(height: 8.0),
@@ -250,7 +300,7 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(14.0), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
                     enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14.0), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
                   ),
-                  items: availableLecturers.map((lec) => DropdownMenuItem(value: lec, child: Text(lec, style: const TextStyle(fontSize: 14.0), overflow: TextOverflow.ellipsis))).toList(),
+                  items: availableLecturers.map((lec) => DropdownMenuItem(value: lec, child: Text(lec, style: const TextStyle(fontSize: 13.5), overflow: TextOverflow.ellipsis))).toList(),
                   onChanged: (val) {
                     if (val != null) setState(() => _selectedLecturer = val);
                   },
@@ -366,7 +416,7 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
                   controller: _topicController,
                   maxLines: 3,
                   decoration: InputDecoration(
-                    hintText: 'เช่น ขอคำปรึกษาเรื่องหัวข้อโปรเจกต์ หรือยื่นเอกสารสัญญาทุนการศึกษา',
+                    hintText: 'เช่น ขอปรึกษาเรื่องหัวข้อโปรเจกต์ หรือขอใช้ห้องปฏิบัติการ',
                     hintStyle: const TextStyle(color: Color(0xFFA0AEC0), fontSize: 13.5),
                     filled: true,
                     fillColor: Colors.white,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:may/screens/appointment_detail.dart';
 
 class ScheduleScreen extends StatefulWidget {
   const ScheduleScreen({super.key});
@@ -70,32 +71,38 @@ class _ScheduleScreenState extends State<ScheduleScreen> with SingleTickerProvid
     final List<Map<String, dynamic>> appointments = [
       {
         'title': 'นัดพบอาจารย์ที่ปรึกษา',
-        'person': 'อ.ดร.สมศักดิ์ วิชาการ',
-        'location': 'อาคาร 15 ชั้น 4 ห้อง 402',
+        'person': 'ผศ.ดร.วิศวกรรม นวัตกรรม',
+        'major': 'วิศวกรรมสารสนเทศและการสื่อสาร',
+        'location': 'อาคารวิศวกรรมศาสตร์ ชั้น 3 ห้อง 302',
         'date': '24 พ.ค. 2567',
         'time': '10:30 - 11:30 น.',
+        'topic': 'ปรึกษาเรื่องหัวข้อโปรเจกต์ภาคเรียนปัจจุบัน',
         'status': 'CONFIRMED',
         'statusText': 'ยืนยันแล้ว',
         'statusColor': const Color(0xFF38A169),
         'statusBg': const Color(0xFFC6F6D5),
       },
       {
-        'title': 'นัดสอบสัมภาษณ์ทุนการศึกษา',
-        'person': 'สำนักงานกิจการนักศึกษา',
-        'location': 'อาคารกิจกรรมนักศึกษา ชั้น 2',
+        'title': 'นัดปรึกษาเรื่องโปรเจกต์',
+        'person': 'อ.ช่างกล ช่างคิด',
+        'major': 'วิศวกรรมสารสนเทศและการสื่อสาร',
+        'location': 'อาคารวิศวกรรมศาสตร์ ชั้น 3 ห้อง 305',
         'date': '26 พ.ค. 2567',
-        'time': '09:00 - 10:00 น.',
+        'time': '13:30 - 15:00 น.',
+        'topic': 'ปรึกษาการเขียนโปรแกรม Flutter และระบบเซิร์ฟเวอร์',
         'status': 'CONFIRMED',
         'statusText': 'ยืนยันแล้ว',
         'statusColor': const Color(0xFF38A169),
         'statusBg': const Color(0xFFC6F6D5),
       },
       {
-        'title': 'นัดติวกลุ่มวิชา Mobile App Development',
-        'person': 'กลุ่มเพื่อนเซกชัน 1',
+        'title': 'นัดติวกลุ่มวิชา Mobile App',
+        'person': 'กลุ่มเพื่อนนักศึกษา',
+        'major': 'วิศวกรรมสารสนเทศและการสื่อสาร',
         'location': 'อาคารโดมเรียนรู้ (Learning Center)',
         'date': '28 พ.ค. 2567',
         'time': '13:30 - 15:00 น.',
+        'topic': 'ทบทวนข้อสอบกลางภาควิชา Mobile Application Design',
         'status': 'PENDING',
         'statusText': 'รอดำเนินการ',
         'statusColor': const Color(0xFFDD6B20),
@@ -125,89 +132,99 @@ class _ScheduleScreenState extends State<ScheduleScreen> with SingleTickerProvid
       itemCount: filtered.length,
       itemBuilder: (context, index) {
         final item = filtered[index];
-        return Container(
-          margin: const EdgeInsets.only(bottom: 16.0),
-          padding: const EdgeInsets.all(18.0),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(18.0),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.04),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
+        return GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => AppointmentDetailScreen(appointment: item),
               ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(
-                      item['title'],
-                      style: const TextStyle(
-                        fontSize: 17.0,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF1A202C),
+            );
+          },
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 16.0),
+            padding: const EdgeInsets.all(18.0),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(18.0),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.04),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        item['title'],
+                        style: const TextStyle(
+                          fontSize: 17.0,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF1A202C),
+                        ),
                       ),
                     ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: item['statusBg'],
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Text(
-                      item['statusText'],
-                      style: TextStyle(
-                        color: item['statusColor'],
-                        fontSize: 12.0,
-                        fontWeight: FontWeight.bold,
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: item['statusBg'],
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        item['statusText'],
+                        style: TextStyle(
+                          color: item['statusColor'],
+                          fontSize: 12.0,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 6),
-              Row(
-                children: [
-                  const Icon(Icons.person_outline_rounded, size: 18, color: Color(0xFF718096)),
-                  const SizedBox(width: 6),
-                  Text(
-                    item['person'],
-                    style: const TextStyle(fontSize: 14.0, color: Color(0xFF4A5568), fontWeight: FontWeight.w500),
-                  ),
-                ],
-              ),
-              const Divider(height: 20, thickness: 0.8),
-              Row(
-                children: [
-                  const Icon(Icons.location_on_outlined, size: 18, color: Color(0xFF4C52D4)),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      item['location'],
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    const Icon(Icons.person_outline_rounded, size: 18, color: Color(0xFF718096)),
+                    const SizedBox(width: 6),
+                    Text(
+                      item['person'],
+                      style: const TextStyle(fontSize: 14.0, color: Color(0xFF4A5568), fontWeight: FontWeight.w500),
+                    ),
+                  ],
+                ),
+                const Divider(height: 20, thickness: 0.8),
+                Row(
+                  children: [
+                    const Icon(Icons.location_on_outlined, size: 18, color: Color(0xFF4C52D4)),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        item['location'],
+                        style: const TextStyle(fontSize: 13.5, color: Color(0xFF4A5568)),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    const Icon(Icons.access_time_rounded, size: 18, color: Color(0xFF4C52D4)),
+                    const SizedBox(width: 6),
+                    Text(
+                      '${item['date']} • ${item['time']}',
                       style: const TextStyle(fontSize: 13.5, color: Color(0xFF4A5568)),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 6),
-              Row(
-                children: [
-                  const Icon(Icons.access_time_rounded, size: 18, color: Color(0xFF4C52D4)),
-                  const SizedBox(width: 6),
-                  Text(
-                    '${item['date']} • ${item['time']}',
-                    style: const TextStyle(fontSize: 13.5, color: Color(0xFF4A5568)),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         );
       },
