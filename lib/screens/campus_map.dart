@@ -11,127 +11,278 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
   late TabController _tabController;
   String _searchQuery = '';
   int? _highlightedBuilding;
+  Map<String, dynamic>? _selectedBuildingForNavigation;
 
   final List<Map<String, dynamic>> _buildings = [
     {
       'id': 1,
       'name': 'อาคารคณะมนุษยศาสตร์และสังคมศาสตร์ (หลังเก่า)',
       'isEng': false,
+      'distance': '350 เมตร',
+      'time': '4 นาที',
+      'steps': [
+        '1. จากประตูทางเข้าฝั่งถนนหาดเจ้าสำราญ มุ่งหน้าตรงเข้าสู่วงเวียนกลาง',
+        '2. ตรงไปอีก 150 เมตร ผ่านอาคารนิวัตสโมสร (อาคาร 25)',
+        '3. ถึงจุดหมายปลายทาง อาคาร 1 คณะมนุษยศาสตร์ฯ (หลังเก่า) ด้านหน้าสนาม',
+      ],
     },
     {
       'id': 2,
       'name': 'อาคารปฏิบัติการโรงแรม (อยู่ระหว่างดำเนินการก่อสร้าง)',
       'isEng': false,
+      'distance': '300 เมตร',
+      'time': '3.5 นาที',
+      'steps': [
+        '1. จากประตูทางเข้า มุ่งหน้าตรงเข้ามายังถนนสายหลักในมหาวิทยาลัย',
+        '2. เลี้ยวซ้ายก่อนถึงอาคาร 1 มุ่งหน้าเขตก่อสร้างอาคารปฏิบัติการโรงแรม',
+        '3. ถึงจุดหมายปลายทาง อาคาร 2',
+      ],
     },
     {
       'id': 3,
       'name': 'อาคารคณะเทคโนโลยีสารสนเทศ',
       'isEng': false,
+      'distance': '280 เมตร',
+      'time': '3 นาที',
+      'steps': [
+        '1. จากประตูทางเข้า ตรงไปทางสี่แยกอาคารศูนย์คอมพิวเตอร์',
+        '2. เลี้ยวขวาเข้าสู่โซนคณะเทคโนโลยีสารสนเทศ',
+        '3. ถึงจุดหมายปลายทาง อาคาร 3 คณะเทคโนโลยีสารสนเทศ',
+      ],
     },
     {
       'id': 4,
       'name': 'อาคารคณะวิทยาศาสตร์และเทคโนโลยี',
       'isEng': false,
+      'distance': '200 เมตร',
+      'time': '2.5 นาที',
+      'steps': [
+        '1. จากประตูทางเข้า เดินตรงเข้าสู่อาคารสำนักงานคณะวิทยาศาสตร์ฯ',
+        '2. ถึงจุดหมายปลายทาง อาคาร 4 ทางด้านซ้ายมือ',
+      ],
     },
     {
-      'id': 5,
       'name': 'อาคารคณะเทคโนโลยีสารสนเทศ + คณะวิทยาศาสตร์และเทคโนโลยี',
+      'id': 5,
       'isEng': false,
+      'distance': '220 เมตร',
+      'time': '2.5 นาที',
+      'steps': [
+        '1. จากประตูทางเข้า เดินตรงเข้าสู่อาคารทางเชื่อมคณะเทคโนโลยีสารสนเทศ',
+        '2. ถึงจุดหมายปลายทาง อาคาร 5',
+      ],
     },
     {
       'id': 7,
       'name': 'อาคารคณะวิทยาศาสตร์และเทคโนโลยี',
       'isEng': false,
+      'distance': '250 เมตร',
+      'time': '3 นาที',
+      'steps': [
+        '1. จากประตูทางเข้า ตรงไปผ่านอาคาร 4 และอาคาร 5',
+        '2. ถึงจุดหมายปลายทาง อาคาร 7',
+      ],
     },
     {
       'id': 8,
       'name': 'อาคารคณะวิศวกรรมศาสตร์และเทคโนโลยีอุตสาหกรรม (สาขาวิศวกรรมอุตสาหการและวิศวกรรมหุ่นยนต์ฯ)',
       'isEng': true,
+      'distance': '380 เมตร',
+      'time': '4.5 นาที',
+      'steps': [
+        '1. จากประตูทางเข้า ตรงไปทางถนนสายหลักในมหาวิทยาลัย',
+        '2. เลี้ยวขวาสี่แยกกลาง มุ่งหน้าโซนโรงช่างปฏิบัติการวิศวกรรม',
+        '3. ถึงจุดหมายปลายทาง อาคาร 8 (โรงช่างปฏิบัติการวิศวกรรมหุ่นยนต์และอุตสาหการ)',
+      ],
     },
     {
       'id': 9,
       'name': 'อาคารคณะครุศาสตร์',
       'isEng': false,
+      'distance': '400 เมตร',
+      'time': '5 นาที',
+      'steps': [
+        '1. จากประตูทางเข้า ตรงไปทางลานกิจกรรมคณะครุศาสตร์',
+        '2. ถึงจุดหมายปลายทาง อาคาร 9 คณะครุศาสตร์',
+      ],
     },
     {
       'id': 10,
       'name': 'อาคารโรงแรมเพชรน้ำหนึ่ง',
       'isEng': false,
+      'distance': '180 เมตร',
+      'time': '2 นาที',
+      'steps': [
+        '1. จากประตูทางเข้า เลี้ยวซ้ายทันที เข้าสู่เขตร้านค้าและโรงแรมเพชรน้ำหนึ่ง',
+        '2. ถึงจุดหมายปลายทาง อาคาร 10',
+      ],
     },
     {
       'id': 11,
       'name': 'อาคารโรงเรียนสาธิตมหาวิทยาลัยราชภัฏเพชรบุรี',
       'isEng': false,
+      'distance': '450 เมตร',
+      'time': '5.5 นาที',
+      'steps': [
+        '1. จากประตูทางเข้า ตรงไปทางฝั่งโซนโรงเรียนสาธิตฯ ด้านหลังมหาวิทยาลัย',
+        '2. ถึงจุดหมายปลายทาง อาคาร 11',
+      ],
     },
     {
       'id': 12,
       'name': 'อาคารสำนักวิทยบริการและเทคโนโลยีสารสนเทศ',
       'isEng': false,
+      'distance': '260 เมตร',
+      'time': '3 นาที',
+      'steps': [
+        '1. จากประตูทางเข้า เดินตรงเข้าสู่อาคารหอพรรณไม้และสำนักวิทยบริการ',
+        '2. ถึงจุดหมายปลายทาง อาคาร 12 (หอสมุดกลาง)',
+      ],
     },
     {
       'id': 13,
       'name': 'อาคารศูนย์วิทยาศาสตร์และวิทยาศาสตร์ประยุกต์',
       'isEng': false,
+      'distance': '380 เมตร',
+      'time': '4.5 นาที',
+      'steps': [
+        '1. จากประตูทางเข้า ตรงไปทางศูนย์วิทยาศาสตร์และห้องปฏิบัติการรวม',
+        '2. ถึงจุดหมายปลายทาง อาคาร 13',
+      ],
     },
     {
       'id': 14,
       'name': 'อาคารวิทยภิรมย์',
       'isEng': false,
+      'distance': '300 เมตร',
+      'time': '3.5 นาที',
+      'steps': [
+        '1. จากประตูทางเข้า ตรงไปทางสวนพฤกษศาสตร์อาคารวิทยภิรมย์',
+        '2. ถึงจุดหมายปลายทาง อาคาร 14',
+      ],
     },
     {
       'id': 16,
       'name': 'อาคารคณะวิศวกรรมศาสตร์และเทคโนโลยีอุตสาหกรรม (อาคารหลัก)',
       'isEng': true,
+      'distance': '290 เมตร',
+      'time': '3.5 นาที',
+      'steps': [
+        '1. จากประตูทางเข้าฝั่งถนนสายหาดเจ้าสำราญ มุ่งหน้าตรงเข้าสู่อาคารสำนักวิทยบริการ',
+        '2. เลี้ยวขวาที่หน้าอาคาร 5 สังเกตป้ายคณะวิศวกรรมศาสตร์และเทคโนโลยีอุตสาหกรรม',
+        '3. ถึงจุดหมายปลายทาง อาคาร 16 คณะวิศวกรรมศาสตร์ฯ (อาคารหลัก)',
+      ],
     },
     {
       'id': 17,
       'name': 'อาคารศูนย์ภาษาและคอมพิวเตอร์',
       'isEng': false,
+      'distance': '320 เมตร',
+      'time': '4 นาที',
+      'steps': [
+        '1. จากประตูทางเข้า ตรงไปทางศูนย์ภาษาและคอมพิวเตอร์',
+        '2. ถึงจุดหมายปลายทาง อาคาร 17',
+      ],
     },
     {
       'id': 18,
       'name': 'อาคารคณะวิทยาการจัดการ',
       'isEng': false,
+      'distance': '350 เมตร',
+      'time': '4 นาที',
+      'steps': [
+        '1. จากประตูทางเข้า ตรงไปทางอาคารคณะวิทยาการจัดการ',
+        '2. ถึงจุดหมายปลายทาง อาคาร 18',
+      ],
     },
     {
       'id': 19,
       'name': 'อาคารคณะเทคโนโลยีการเกษตร',
       'isEng': false,
+      'distance': '480 เมตร',
+      'time': '6 นาที',
+      'steps': [
+        '1. จากประตูทางเข้า ตรงไปทางทิศใต้ เขตคณะเทคโนโลยีการเกษตรและแปลงสาธิต',
+        '2. ถึงจุดหมายปลายทาง อาคาร 19',
+      ],
     },
     {
       'id': 22,
       'name': 'อาคารสุเมธตันติเวชกุล',
       'isEng': false,
+      'distance': '420 เมตร',
+      'time': '5 นาที',
+      'steps': [
+        '1. จากประตูทางเข้า ตรงไปทางหอประชุมใหญ่สุเมธตันติเวชกุล',
+        '2. ถึงจุดหมายปลายทาง อาคาร 22',
+      ],
     },
     {
       'id': 23,
       'name': 'อาคารคณะมนุษยศาสตร์และสังคมศาสตร์',
       'isEng': false,
+      'distance': '360 เมตร',
+      'time': '4.5 นาที',
+      'steps': [
+        '1. จากประตูทางเข้า ตรงไปทางอาคารคณะมนุษยศาสตร์ฯ',
+        '2. ถึงจุดหมายปลายทาง อาคาร 23',
+      ],
     },
     {
       'id': 25,
       'name': 'อาคารนิวัตสโมสร (Student Union)',
       'isEng': false,
+      'distance': '310 เมตร',
+      'time': '3.5 นาที',
+      'steps': [
+        '1. จากประตูทางเข้า ตรงไปทางอาคารกิจกรรมนักศึกษา นิวัตสโมสร',
+        '2. ถึงจุดหมายปลายทาง อาคาร 25',
+      ],
     },
     {
       'id': 26,
       'name': 'อาคารราชพฤกษ์ (คณะเทคโนโลยีสารสนเทศ)',
       'isEng': false,
+      'distance': '340 เมตร',
+      'time': '4 นาที',
+      'steps': [
+        '1. จากประตูทางเข้า ตรงไปทางอาคารราชพฤกษ์ คณะเทคโนโลยีสารสนเทศ',
+        '2. ถึงจุดหมายปลายทาง อาคาร 26',
+      ],
     },
     {
       'id': 28,
       'name': 'อาคารคณะวิศวกรรมศาสตร์และเทคโนโลยีอุตสาหกรรม (อาคารใหม่)',
       'isEng': true,
+      'distance': '320 เมตร',
+      'time': '4 นาที',
+      'steps': [
+        '1. จากประตูทางเข้าฝั่งถนนสายหาดเจ้าสำราญ มุ่งหน้าตรงเข้าสู่อาคารสำนักวิทยบริการ',
+        '2. เลี้ยวขวาที่หน้าอาคาร 5 สังเกตป้ายอาคารใหม่คณะวิศวกรรมศาสตร์ฯ',
+        '3. ถึงจุดหมายปลายทาง อาคาร 28 คณะวิศวกรรมศาสตร์ฯ (อาคารใหม่)',
+      ],
     },
     {
       'id': 29,
       'name': 'อาคารคณะพยาบาลศาสตร์และวิทยาศาสตร์สุขภาพ',
       'isEng': false,
+      'distance': '330 เมตร',
+      'time': '4 นาที',
+      'steps': [
+        '1. จากประตูทางเข้า ตรงไปทางอาคารคณะพยาบาลศาสตร์ฯ',
+        '2. ถึงจุดหมายปลายทาง อาคาร 29',
+      ],
     },
     {
       'id': 33,
       'name': 'อาคารสถาบันช่างเมืองเพชรและศิลปะร่วมสมัย',
       'isEng': false,
+      'distance': '340 เมตร',
+      'time': '4 นาที',
+      'steps': [
+        '1. จากประตูทางเข้า ตรงไปทางอาคารสถาบันช่างเมืองเพชรฯ',
+        '2. ถึงจุดหมายปลายทาง อาคาร 33',
+      ],
     },
   ];
 
@@ -145,6 +296,149 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
   void dispose() {
     _tabController.dispose();
     super.dispose();
+  }
+
+  void _showNavigationModal(Map<String, dynamic> item) {
+    const primaryColor = Color(0xFF4C52D4);
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24.0)),
+      ),
+      builder: (context) {
+        final List<String> steps = item['steps'] ?? [];
+
+        return DraggableScrollableSheet(
+          initialChildSize: 0.65,
+          minChildSize: 0.4,
+          maxChildSize: 0.9,
+          expand: false,
+          builder: (context, scrollController) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
+              child: ListView(
+                controller: scrollController,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 5,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFCBD5E0),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16.0),
+
+                  // Header Info
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 24,
+                        backgroundColor: item['isEng'] ? primaryColor : const Color(0xFFEDF2F7),
+                        child: Text(
+                          '${item['id']}',
+                          style: TextStyle(
+                            color: item['isEng'] ? Colors.white : const Color(0xFF2D3748),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              item['name'],
+                              style: TextStyle(
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.bold,
+                                color: item['isEng'] ? primaryColor : const Color(0xFF1A202C),
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              'ระยะทาง: ${item['distance']} • เดินประมาณ ${item['time']}',
+                              style: const TextStyle(fontSize: 13.0, color: Color(0xFF718096), fontWeight: FontWeight.w500),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Divider(height: 28, thickness: 0.8),
+
+                  // Step-by-Step Directions
+                  const Row(
+                    children: [
+                      Icon(Icons.directions_walk_rounded, color: primaryColor, size: 22),
+                      SizedBox(width: 8),
+                      Text(
+                        'เส้นทางแนะนำจากประตูทางเข้า PBRU:',
+                        style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: Color(0xFF1A202C)),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 14.0),
+
+                  ...steps.map((step) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 12.0),
+                      child: Container(
+                        padding: const EdgeInsets.all(14.0),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF7FAFC),
+                          borderRadius: BorderRadius.circular(12.0),
+                          border: Border.all(color: const Color(0xFFE2E8F0)),
+                        ),
+                        child: Text(
+                          step,
+                          style: const TextStyle(fontSize: 13.5, color: Color(0xFF2D3748), height: 1.4),
+                        ),
+                      ),
+                    );
+                  }),
+
+                  const SizedBox(height: 20.0),
+
+                  // Action Navigation Buttons
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            setState(() {
+                              _highlightedBuilding = item['id'];
+                              _selectedBuildingForNavigation = item;
+                              _tabController.animateTo(0); // Switch to Map tab!
+                            });
+                          },
+                          icon: const Icon(Icons.navigation_rounded),
+                          label: const Text('นำทางบนแผนที่ PBRU', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: primaryColor,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -201,22 +495,27 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
                       gradient: const LinearGradient(colors: [primaryColor, Color(0xFF6B72E1)]),
                       borderRadius: BorderRadius.circular(16.0),
                     ),
-                    child: const Row(
+                    child: Row(
                       children: [
-                        Icon(Icons.engineering_rounded, color: Colors.white, size: 28),
-                        SizedBox(width: 12),
+                        const Icon(Icons.engineering_rounded, color: Colors.white, size: 28),
+                        const SizedBox(width: 12),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'คณะวิศวกรรมศาสตร์และเทคโนโลยีอุตสาหกรรม',
-                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14.5),
+                                _selectedBuildingForNavigation != null
+                                    ? 'นำทางไป: ${_selectedBuildingForNavigation!['name']}'
+                                    : 'คณะวิศวกรรมศาสตร์และเทคโนโลยีอุตสาหกรรม',
+                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14.0),
+                                overflow: TextOverflow.ellipsis,
                               ),
-                              SizedBox(height: 2),
+                              const SizedBox(height: 2),
                               Text(
-                                'อาคารหมายเลข: 16 (อาคารหลัก), 8 (โรงช่างหุ่นยนต์), 28 (อาคารใหม่)',
-                                style: TextStyle(color: Color(0xFFE0E5FF), fontSize: 12.5),
+                                _selectedBuildingForNavigation != null
+                                    ? 'ระยะทาง: ${_selectedBuildingForNavigation!['distance']} • เดิน ${_selectedBuildingForNavigation!['time']}'
+                                    : 'อาคารหมายเลข: 16 (อาคารหลัก), 8 (โรงช่างหุ่นยนต์), 28 (อาคารใหม่)',
+                                style: const TextStyle(color: Color(0xFFE0E5FF), fontSize: 12.0),
                               ),
                             ],
                           ),
@@ -258,9 +557,9 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
                               child: const Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(Icons.touch_app_rounded, size: 16, color: primaryColor),
+                                  Icon(Icons.directions_rounded, size: 16, color: primaryColor),
                                   SizedBox(width: 4),
-                                  Text('กดที่อาคารเพื่อดูชื่อ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: primaryColor)),
+                                  Text('กดที่รายการอาคารเพื่อรับเส้นทาง', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: primaryColor)),
                                 ],
                               ),
                             ),
@@ -318,56 +617,65 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
                       final item = filteredList[index];
                       final bool isEng = item['isEng'];
 
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 12.0),
-                        padding: const EdgeInsets.all(16.0),
-                        decoration: BoxDecoration(
-                          color: isEng ? const Color(0xFFF0F3FE) : Colors.white,
-                          borderRadius: BorderRadius.circular(16.0),
-                          border: isEng ? Border.all(color: primaryColor, width: 1.5) : Border.all(color: const Color(0xFFE2E8F0)),
-                          boxShadow: [
-                            BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 8, offset: const Offset(0, 3)),
-                          ],
-                        ),
-                        child: Row(
-                          children: [
-                            CircleAvatar(
-                              radius: 22,
-                              backgroundColor: isEng ? primaryColor : const Color(0xFFEDF2F7),
-                              child: Text(
-                                '${item['id']}',
-                                style: TextStyle(
-                                  color: isEng ? Colors.white : const Color(0xFF2D3748),
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15,
+                      return GestureDetector(
+                        onTap: () {
+                          _showNavigationModal(item);
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.only(bottom: 12.0),
+                          padding: const EdgeInsets.all(16.0),
+                          decoration: BoxDecoration(
+                            color: isEng ? const Color(0xFFF0F3FE) : Colors.white,
+                            borderRadius: BorderRadius.circular(16.0),
+                            border: isEng ? Border.all(color: primaryColor, width: 1.5) : Border.all(color: const Color(0xFFE2E8F0)),
+                            boxShadow: [
+                              BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 8, offset: const Offset(0, 3)),
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              CircleAvatar(
+                                radius: 22,
+                                backgroundColor: isEng ? primaryColor : const Color(0xFFEDF2F7),
+                                child: Text(
+                                  '${item['id']}',
+                                  style: TextStyle(
+                                    color: isEng ? Colors.white : const Color(0xFF2D3748),
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                  ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(width: 14),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    item['name'],
-                                    style: TextStyle(
-                                      fontSize: 14.5,
-                                      fontWeight: isEng ? FontWeight.bold : FontWeight.w600,
-                                      color: isEng ? primaryColor : const Color(0xFF2D3748),
-                                    ),
-                                  ),
-                                  if (isEng)
-                                    const Padding(
-                                      padding: EdgeInsets.only(top: 4.0),
-                                      child: Text(
-                                        '★ คณะวิศวกรรมศาสตร์และเทคโนโลยีอุตสาหกรรม',
-                                        style: TextStyle(fontSize: 12.0, color: primaryColor, fontWeight: FontWeight.bold),
+                              const SizedBox(width: 14),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      item['name'],
+                                      style: TextStyle(
+                                        fontSize: 14.5,
+                                        fontWeight: isEng ? FontWeight.bold : FontWeight.w600,
+                                        color: isEng ? primaryColor : const Color(0xFF2D3748),
                                       ),
                                     ),
-                                ],
+                                    const SizedBox(height: 4),
+                                    Row(
+                                      children: [
+                                        const Icon(Icons.directions_walk_rounded, size: 14, color: primaryColor),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          '${item['distance']} • เดิน ${item['time']}',
+                                          style: const TextStyle(fontSize: 12.0, color: Color(0xFF718096)),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                              const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: primaryColor),
+                            ],
+                          ),
                         ),
                       );
                     },
@@ -413,7 +721,7 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
   }
 }
 
-// Custom Painter representing PBRU Campus Map Layout from image
+// Custom Painter representing PBRU Campus Map Layout & Active Navigation Route
 class _PBRUMapPainter extends CustomPainter {
   final int? highlightedBuilding;
 
@@ -468,6 +776,34 @@ class _PBRUMapPainter extends CustomPainter {
     // Gate & 7-Eleven
     _drawMarker(canvas, Offset(w * 0.08, h * 0.62), 'ประตู', Colors.red);
     _drawMarker(canvas, Offset(w * 0.08, h * 0.25), '7-11', Colors.orange);
+
+    // DRAW ACTIVE NAVIGATION ROUTE LINE IF A BUILDING IS SELECTED!
+    if (highlightedBuilding != null) {
+      final Offset startGate = Offset(w * 0.15, h * 0.60);
+      Offset destPos = Offset(w * 0.55, h * 0.52); // Default to Bldg 16
+
+      if (highlightedBuilding == 8) destPos = Offset(w * 0.55, h * 0.88);
+      if (highlightedBuilding == 28) destPos = Offset(w * 0.58, h * 0.54);
+      if (highlightedBuilding == 1) destPos = Offset(w * 0.50, h * 0.82);
+      if (highlightedBuilding == 3) destPos = Offset(w * 0.58, h * 0.50);
+
+      // Route Line
+      final routePath = Path()
+        ..moveTo(startGate.dx, startGate.dy)
+        ..lineTo(w * 0.38, h * 0.60)
+        ..lineTo(destPos.dx, destPos.dy);
+
+      final routePaint = Paint()
+        ..color = const Color(0xFFFF6B00)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 6
+        ..strokeCap = StrokeCap.round;
+
+      canvas.drawPath(routePath, routePaint);
+
+      // Start Pulse Circle
+      canvas.drawCircle(startGate, 8, Paint()..color = const Color(0xFFFF6B00));
+    }
 
     // PBRU Buildings
     _drawBuildingNode(canvas, Offset(w * 0.50, h * 0.82), 1, '1');
