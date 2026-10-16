@@ -241,7 +241,7 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
                 ),
                 const SizedBox(height: 8.0),
                 DropdownButtonFormField<String>(
-                  value: _appointmentType,
+                  initialValue: _appointmentType,
                   decoration: InputDecoration(
                     prefixIcon: const Icon(Icons.category_outlined, color: primaryColor),
                     filled: true,
@@ -263,7 +263,7 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
                 ),
                 const SizedBox(height: 8.0),
                 DropdownButtonFormField<String>(
-                  value: _selectedMajor,
+                  initialValue: _selectedMajor,
                   isExpanded: true,
                   decoration: InputDecoration(
                     prefixIcon: const Icon(Icons.school_outlined, color: primaryColor),
@@ -291,7 +291,7 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
                 ),
                 const SizedBox(height: 8.0),
                 DropdownButtonFormField<String>(
-                  value: _selectedLecturer,
+                  initialValue: _selectedLecturer,
                   isExpanded: true,
                   decoration: InputDecoration(
                     prefixIcon: const Icon(Icons.person_search_outlined, color: primaryColor),

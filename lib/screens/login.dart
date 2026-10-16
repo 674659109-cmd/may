@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:may/models/user_data.dart';
+import 'package:may/screens/lecturer_login_form.dart';
 import 'package:may/screens/login_form.dart';
 import 'package:may/screens/register.dart';
 
@@ -58,7 +60,7 @@ class LoginScreen extends StatelessWidget {
                 ),
               ),
 
-              // Login Button
+              // Student Login Button
               SizedBox(
                 width: double.infinity,
                 height: 52.0,
@@ -78,7 +80,7 @@ class LoginScreen extends StatelessWidget {
                     ),
                   ),
                   child: const Text(
-                    'เข้าสู่ระบบ',
+                    'เข้าสู่ระบบ (นักศึกษา)',
                     style: TextStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
@@ -112,7 +114,7 @@ class LoginScreen extends StatelessWidget {
                     ),
                   ),
                   child: const Text(
-                    'สมัครสมาชิก',
+                    'สมัครสมาชิกนักศึกษา',
                     style: TextStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
@@ -121,7 +123,33 @@ class LoginScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 32.0),
+              const SizedBox(height: 18.0),
+
+              // Lecturer Login Link
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const LecturerLoginFormScreen()),
+                  );
+                },
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.engineering_rounded, color: primaryColor, size: 20),
+                    SizedBox(width: 6),
+                    Text(
+                      'เข้าสู่ระบบสำหรับอาจารย์ / บุคลากร',
+                      style: TextStyle(
+                        color: primaryColor,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15.0,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20.0),
 
               // Footer Text
               const Text(
@@ -429,7 +457,7 @@ class _IllustrationPainter extends CustomPainter {
     final windowPaint = Paint()..color = const Color(0xFFE8EEFF);
     final doorPaint = Paint()..color = const Color(0xFF3B40A4);
 
-    // Left & Right Building Wings
+    // Main Wings (Left & Right)
     canvas.drawRRect(
       RRect.fromRectAndRadius(
         Rect.fromLTWH(w * 0.18, h * 0.38, w * 0.64, h * 0.26),

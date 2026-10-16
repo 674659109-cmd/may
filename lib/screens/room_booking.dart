@@ -11,7 +11,7 @@ class _RoomBookingScreenState extends State<RoomBookingScreen> {
   final _formKey = GlobalKey<FormState>();
   String _selectedRoom = 'ห้องแล็บวิศวกรรมคอมพิวเตอร์และปัญญาประดิษฐ์ (ENG-302)';
   String _selectedTimeSlot = '10:00 - 12:00 น.';
-  DateTime _selectedDate = DateTime.now().add(const Duration(days: 1));
+  final DateTime _selectedDate = DateTime.now().add(const Duration(days: 1));
   final _objectiveController = TextEditingController();
 
   final List<String> _rooms = [
@@ -117,7 +117,7 @@ class _RoomBookingScreenState extends State<RoomBookingScreen> {
                 const Text('เลือกห้องเรียน / ห้องแล็บ', style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: Color(0xFF2D3748))),
                 const SizedBox(height: 8.0),
                 DropdownButtonFormField<String>(
-                  value: _selectedRoom,
+                  initialValue: _selectedRoom,
                   isExpanded: true,
                   decoration: InputDecoration(
                     prefixIcon: const Icon(Icons.door_sliding_outlined, color: primaryColor),

@@ -52,7 +52,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Column(
                 children: [
                   SwitchListTile(
-                    activeColor: primaryColor,
+                    activeThumbColor: primaryColor,
                     secondary: const Icon(Icons.notifications_active_rounded, color: primaryColor),
                     title: const Text('การแจ้งเตือนเตือนนัดพบ', style: TextStyle(fontWeight: FontWeight.w600)),
                     subtitle: const Text('แจ้งเตือนก่อนเวลานัดหมาย 30 นาที'),
@@ -61,7 +61,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   const Divider(height: 1, indent: 56),
                   SwitchListTile(
-                    activeColor: primaryColor,
+                    activeThumbColor: primaryColor,
                     secondary: const Icon(Icons.mark_email_unread_rounded, color: primaryColor),
                     title: const Text('การแจ้งเตือนทางอีเมล', style: TextStyle(fontWeight: FontWeight.w600)),
                     subtitle: const Text('ส่งอีเมลยืนยันคำขอนัดหมาย'),
@@ -70,7 +70,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   const Divider(height: 1, indent: 56),
                   SwitchListTile(
-                    activeColor: primaryColor,
+                    activeThumbColor: primaryColor,
                     secondary: const Icon(Icons.volume_up_rounded, color: primaryColor),
                     title: const Text('เสียงเตือนการแจ้งเตือน', style: TextStyle(fontWeight: FontWeight.w600)),
                     value: _soundEnabled,

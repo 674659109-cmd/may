@@ -1,4 +1,6 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:may/models/user_data.dart';
 
 class EditProfileScreen extends StatefulWidget {
@@ -14,6 +16,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late TextEditingController _studentIdController;
   late TextEditingController _emailController;
   late String _selectedMajor;
+
+  Uint8List? _selectedImageBytes;
+  final ImagePicker _picker = ImagePicker();
 
   final List<String> _engineeringMajors = [
     'สาขาวิชาวิศวกรรมเครื่องกล',
@@ -31,6 +36,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _studentIdController = TextEditingController(text: UserData.studentId);
     _emailController = TextEditingController(text: UserData.email);
     _selectedMajor = _engineeringMajors.contains(UserData.major) ? UserData.major : _engineeringMajors.first;
+    _selectedImageBytes = UserData.profileImageBytes;
   }
 
   @override
@@ -41,6 +47,83 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     super.dispose();
   }
 
+  Future<void> _pickImage(ImageSource source) async {
+    try {
+      final XFile? image = await _picker.pickImage(
+        source: source,
+        maxWidth: 600,
+        maxHeight: 600,
+        imageQuality: 85,
+      );
+      if (image != null) {
+        final bytes = await image.readAsBytes();
+        setState(() {
+          _selectedImageBytes = bytes;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('ไม่สามารถโหลดรูปภาพได้: $e')),
+        );
+      }
+    }
+  }
+
+  void _showImagePickerModal() {
+    const primaryColor = Color(0xFF4C52D4);
+
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'เลือกรูปภาพโปรไฟล์',
+                  style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: Color(0xFF1A202C)),
+                ),
+                const SizedBox(height: 16.0),
+                ListTile(
+                  leading: const CircleAvatar(
+                    backgroundColor: Color(0xFFE0E7FF),
+                    child: Icon(Icons.photo_library_rounded, color: primaryColor),
+                  ),
+                  title: const Text('เลือกรูปจากคลังภาพ (Gallery)', style: TextStyle(fontWeight: FontWeight.bold)),
+                  subtitle: const Text('เลือกไฟล์รูปภาพจากอุปกรณ์'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _pickImage(ImageSource.gallery);
+                  },
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const CircleAvatar(
+                    backgroundColor: Color(0xFFE0E7FF),
+                    child: Icon(Icons.camera_alt_rounded, color: primaryColor),
+                  ),
+                  title: const Text('ถ่ายภาพด้วยกล้อง (Camera)', style: TextStyle(fontWeight: FontWeight.bold)),
+                  subtitle: const Text('ถ่ายรูปภาพใหม่ด้วยกล้อง'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _pickImage(ImageSource.camera);
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   void _saveProfile() {
     if (_formKey.currentState!.validate()) {
       setState(() {
@@ -48,6 +131,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         UserData.studentId = _studentIdController.text.trim();
         UserData.email = _emailController.text.trim();
         UserData.major = _selectedMajor;
+        UserData.profileImageBytes = _selectedImageBytes;
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -83,24 +167,43 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Profile Avatar Edit
-                Stack(
-                  children: [
-                    CircleAvatar(
-                      radius: 50,
-                      backgroundColor: primaryColor.withOpacity(0.12),
-                      child: const Icon(Icons.person_rounded, color: primaryColor, size: 60),
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: CircleAvatar(
-                        radius: 16,
-                        backgroundColor: primaryColor,
-                        child: const Icon(Icons.camera_alt_rounded, color: Colors.white, size: 16),
+                // Profile Avatar Edit with Image Picker
+                GestureDetector(
+                  onTap: _showImagePickerModal,
+                  child: Stack(
+                    children: [
+                      CircleAvatar(
+                        radius: 54,
+                        backgroundColor: primaryColor.withOpacity(0.12),
+                        backgroundImage: _selectedImageBytes != null
+                            ? MemoryImage(_selectedImageBytes!)
+                            : null,
+                        child: _selectedImageBytes == null
+                            ? const Icon(Icons.person_rounded, color: primaryColor, size: 64)
+                            : null,
                       ),
-                    ),
-                  ],
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Container(
+                          padding: const EdgeInsets.all(8.0),
+                          decoration: const BoxDecoration(
+                            color: primaryColor,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.camera_alt_rounded, color: Colors.white, size: 18),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8.0),
+                GestureDetector(
+                  onTap: _showImagePickerModal,
+                  child: const Text(
+                    'เปลี่ยนรูปโปรไฟล์',
+                    style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold, fontSize: 14.0),
+                  ),
                 ),
                 const SizedBox(height: 28.0),
 
@@ -134,7 +237,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 // Major Dropdown
                 _buildFieldLabel('สาขาวิชา'),
                 DropdownButtonFormField<String>(
-                  value: _selectedMajor,
+                  initialValue: _selectedMajor,
                   isExpanded: true,
                   decoration: _buildInputDecoration(Icons.school_outlined, ''),
                   items: _engineeringMajors

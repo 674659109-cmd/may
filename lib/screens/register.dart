@@ -43,9 +43,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
   void _handleRegister() {
     if (_formKey.currentState!.validate()) {
       setState(() {
+        UserData.hasAccount = true;
         UserData.name = _nameController.text.trim();
         UserData.studentId = _studentIdController.text.trim();
         UserData.email = _emailController.text.trim();
+        UserData.password = _passwordController.text;
         UserData.major = _selectedMajor;
       });
 
@@ -226,7 +228,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 const SizedBox(height: 8.0),
                 DropdownButtonFormField<String>(
-                  value: _selectedMajor,
+                  initialValue: _selectedMajor,
                   isExpanded: true,
                   decoration: InputDecoration(
                     prefixIcon: const Icon(Icons.engineering_outlined, color: primaryColor),

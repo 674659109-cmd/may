@@ -26,20 +26,74 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
   void _handleLogin() {
     if (_formKey.currentState!.validate()) {
       final input = _usernameController.text.trim();
-      if (input.isNotEmpty) {
-        if (input.contains('@')) {
-          UserData.email = input;
-          final parts = input.split('@');
-          if (parts.isNotEmpty && parts.first.isNotEmpty) {
-            UserData.studentId = parts.first;
-          }
-        } else {
-          UserData.studentId = input;
-          if (UserData.email.isEmpty) {
-            UserData.email = '$input@pbru.ac.th';
-          }
-        }
+      final passwordInput = _passwordController.text;
+
+      // 1. Strict Username (Student ID / Email) Validation
+      final isStudentIdMatch = input == UserData.studentId;
+      final isEmailMatch = input == UserData.email;
+
+      if (!isStudentIdMatch && !isEmailMatch) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: const Color(0xFFE53E3E),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            behavior: SnackBarBehavior.floating,
+            content: const Row(
+              children: [
+                Icon(Icons.error_outline_rounded, color: Colors.white),
+                SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'รหัสนักศึกษา หรือ อีเมลไม่ถูกต้อง (ผิดแม้อย่างละ 1 ตัวอักษรจะไม่สามารถเข้าได้)',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+        return; // Block login
       }
+
+      // 2. Strict Password Validation
+      if (passwordInput != UserData.password) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: const Color(0xFFE53E3E),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            behavior: SnackBarBehavior.floating,
+            content: const Row(
+              children: [
+                Icon(Icons.lock_clock_outlined, color: Colors.white),
+                SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'รหัสผ่านไม่ถูกต้อง กรุณาตรวจสอบและลองใหม่อีกครั้ง',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+        return; // Block login
+      }
+
+      // Successful login
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: const Color(0xFF38A169),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          behavior: SnackBarBehavior.floating,
+          content: const Row(
+            children: [
+              Icon(Icons.check_circle_outline_rounded, color: Colors.white),
+              SizedBox(width: 10),
+              Text('เข้าสู่ระบบสำเร็จ', style: TextStyle(fontWeight: FontWeight.bold)),
+            ],
+          ),
+        ),
+      );
 
       Navigator.pushAndRemoveUntil(
         context,
