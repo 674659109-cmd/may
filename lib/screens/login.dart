@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:may/models/user_data.dart';
+import 'package:may/screens/home.dart';
+import 'package:may/screens/lecturer_home.dart';
 import 'package:may/screens/lecturer_login_form.dart';
 import 'package:may/screens/login_form.dart';
 import 'package:may/screens/register.dart';
@@ -20,32 +22,32 @@ class LoginScreen extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
           child: Column(
             children: [
-              const SizedBox(height: 12.0),
+              const SizedBox(height: 8.0),
               
               // Logo Icon
               const _LogoIcon(color: primaryColor),
-              const SizedBox(height: 12.0),
+              const SizedBox(height: 8.0),
 
               // Title
               const Text(
                 'CampusMeet',
                 style: TextStyle(
-                  fontSize: 32.0,
+                  fontSize: 30.0,
                   fontWeight: FontWeight.bold,
                   color: primaryColor,
                   letterSpacing: -0.5,
                 ),
               ),
-              const SizedBox(height: 8.0),
+              const SizedBox(height: 4.0),
 
               // Subtitle
               const Text(
                 'นัดง่าย รู้สถานะ ไม่เสียเวลา\nในมหาวิทยาลัย',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 16.0,
+                  fontSize: 15.0,
                   color: subtitleColor,
-                  height: 1.4,
+                  height: 1.3,
                   fontWeight: FontWeight.w400,
                 ),
               ),
@@ -54,16 +56,74 @@ class LoginScreen extends StatelessWidget {
               Expanded(
                 child: Center(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 12.0),
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
                     child: _CampusIllustration(),
                   ),
                 ),
               ),
 
+              // FAST DEMO MODE BUTTON (1-Click Instant Login)
+              Container(
+                width: double.infinity,
+                height: 52.0,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF38A169), Color(0xFF2F855A)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(16.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF38A169).withOpacity(0.3),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    UserData.loadDemoStudent();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        backgroundColor: Color(0xFF38A169),
+                        content: Row(
+                          children: [
+                            Icon(Icons.bolt_rounded, color: Colors.white),
+                            SizedBox(width: 8),
+                            Text('เข้าสู่ระบบโหมดผู้ทดลองรวดเร็วสำเร็จ! (นักศึกษา 674659109)', style: TextStyle(fontWeight: FontWeight.bold)),
+                          ],
+                        ),
+                      ),
+                    );
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => const HomeScreen()),
+                      (route) => false,
+                    );
+                  },
+                  icon: const Icon(Icons.bolt_rounded, color: Colors.white, size: 24),
+                  label: const Text(
+                    'ทดลองเข้าใช้งานรวดเร็ว (Demo Mode)',
+                    style: TextStyle(
+                      fontSize: 16.5,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10.0),
+
               // Student Login Button
               SizedBox(
                 width: double.infinity,
-                height: 52.0,
+                height: 48.0,
                 child: ElevatedButton(
                   onPressed: () {
                     Navigator.push(
@@ -76,92 +136,75 @@ class LoginScreen extends StatelessWidget {
                     foregroundColor: Colors.white,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16.0),
+                      borderRadius: BorderRadius.circular(14.0),
                     ),
                   ),
                   child: const Text(
-                    'เข้าสู่ระบบ (นักศึกษา)',
+                    'เข้าสู่ระบบ (กรอกข้อมูลปกติ)',
                     style: TextStyle(
-                      fontSize: 18.0,
+                      fontSize: 16.0,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
               ),
-              const SizedBox(height: 12.0),
+              const SizedBox(height: 10.0),
 
-              // Register Button
-              SizedBox(
-                width: double.infinity,
-                height: 52.0,
-                child: OutlinedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const RegisterScreen()),
-                    );
-                  },
-                  style: OutlinedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: const Color(0xFF2D3748),
-                    side: const BorderSide(
-                      color: Color(0xFFC3C7F4),
-                      width: 1.5,
-                    ),
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16.0),
+              // Register & Lecturer Options Row
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const RegisterScreen()),
+                        );
+                      },
+                      style: OutlinedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: const Color(0xFF2D3748),
+                        side: const BorderSide(color: Color(0xFFC3C7F4), width: 1.5),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.0)),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      child: const Text('สมัครสมาชิก', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                     ),
                   ),
-                  child: const Text(
-                    'สมัครสมาชิกนักศึกษา',
-                    style: TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF2D3748),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 18.0),
-
-              // Lecturer Login Link
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const LecturerLoginFormScreen()),
-                  );
-                },
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.engineering_rounded, color: primaryColor, size: 20),
-                    SizedBox(width: 6),
-                    Text(
-                      'เข้าสู่ระบบสำหรับอาจารย์ / บุคลากร',
-                      style: TextStyle(
-                        color: primaryColor,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15.0,
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const LecturerLoginFormScreen()),
+                        );
+                      },
+                      icon: const Icon(Icons.engineering_rounded, size: 18, color: primaryColor),
+                      label: const Text('โหมดอาจารย์', style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold, fontSize: 14)),
+                      style: OutlinedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        side: const BorderSide(color: primaryColor, width: 1.5),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.0)),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 20.0),
+              const SizedBox(height: 16.0),
 
               // Footer Text
               const Text(
                 'คณะวิศวกรรมศาสตร์และเทคโนโลยีอุตสาหกรรม มรภ.เพชรบุรี',
                 style: TextStyle(
-                  fontSize: 14.0,
+                  fontSize: 13.0,
                   color: footerColor,
                   fontWeight: FontWeight.w500,
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 8.0),
+              const SizedBox(height: 4.0),
             ],
           ),
         ),
@@ -179,8 +222,8 @@ class _LogoIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 72,
-      height: 72,
+      width: 64,
+      height: 64,
       child: CustomPaint(
         painter: _LogoPainter(color: color),
       ),

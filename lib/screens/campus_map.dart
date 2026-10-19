@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 class CampusMapScreen extends StatefulWidget {
-  const CampusMapScreen({super.key});
+  final int? initialBuildingId;
+
+  const CampusMapScreen({super.key, this.initialBuildingId});
 
   @override
   State<CampusMapScreen> createState() => _CampusMapScreenState();
@@ -23,7 +25,7 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
       'steps': [
         '1. จากประตูทางเข้าฝั่งถนนหาดเจ้าสำราญ มุ่งหน้าตรงเข้าสู่วงเวียนกลาง',
         '2. ตรงไปอีก 150 เมตร ผ่านอาคารนิวัตสโมสร (อาคาร 25)',
-        '3. ถึงจุดหมายปลายทาง อาคาร 1 คณะมนุษยศาสตร์ฯ (หลังเก่า) ด้านหน้าสนาม',
+        '3. ถึงจุดหมายปลายทาง อาคาร 1 คณะมนุษยศาสตร์ฯ (หลังเก่า)',
       ],
     },
     {
@@ -62,8 +64,8 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
       ],
     },
     {
-      'name': 'อาคารคณะเทคโนโลยีสารสนเทศ + คณะวิทยาศาสตร์และเทคโนโลยี',
       'id': 5,
+      'name': 'อาคารคณะเทคโนโลยีสารสนเทศ + คณะวิทยาศาสตร์และเทคโนโลยี',
       'isEng': false,
       'distance': '220 เมตร',
       'time': '2.5 นาที',
@@ -290,12 +292,74 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+
+    if (widget.initialBuildingId != null) {
+      _highlightedBuilding = widget.initialBuildingId;
+      _selectedBuildingForNavigation = _buildings.firstWhere(
+        (b) => b['id'] == widget.initialBuildingId,
+        orElse: () => _buildings[13], // default to Bldg 16
+      );
+    }
   }
 
   @override
   void dispose() {
     _tabController.dispose();
     super.dispose();
+  }
+
+  void _handleCanvasTap(TapUpDetails details, Size mapSize) {
+    final double w = mapSize.width;
+    final double h = mapSize.height;
+    final Offset tapOffset = details.localPosition;
+
+    // Building Node Coordinates Map
+    final Map<int, Offset> nodePositions = {
+      1: Offset(w * 0.50, h * 0.82),
+      2: Offset(w * 0.42, h * 0.78),
+      3: Offset(w * 0.58, h * 0.50),
+      4: Offset(w * 0.42, h * 0.48),
+      5: Offset(w * 0.48, h * 0.52),
+      7: Offset(w * 0.55, h * 0.62),
+      8: Offset(w * 0.55, h * 0.88),
+      9: Offset(w * 0.70, h * 0.45),
+      10: Offset(w * 0.28, h * 0.32),
+      11: Offset(w * 0.85, h * 0.58),
+      12: Offset(w * 0.50, h * 0.32),
+      13: Offset(w * 0.58, h * 0.88),
+      14: Offset(w * 0.42, h * 0.38),
+      16: Offset(w * 0.55, h * 0.52),
+      17: Offset(w * 0.42, h * 0.22),
+      18: Offset(w * 0.50, h * 0.22),
+      19: Offset(w * 0.78, h * 0.82),
+      22: Offset(w * 0.82, h * 0.42),
+      23: Offset(w * 0.58, h * 0.22),
+      25: Offset(w * 0.60, h * 0.38),
+      26: Offset(w * 0.58, h * 0.10),
+      28: Offset(w * 0.58, h * 0.54),
+      29: Offset(w * 0.50, h * 0.10),
+      33: Offset(w * 0.58, h * 0.32),
+    };
+
+    int? tappedBuildingId;
+    double minDistance = 35.0; // Tap detection radius
+
+    nodePositions.forEach((id, pos) {
+      final double dist = (tapOffset - pos).distance;
+      if (dist < minDistance) {
+        minDistance = dist;
+        tappedBuildingId = id;
+      }
+    });
+
+    if (tappedBuildingId != null) {
+      final item = _buildings.firstWhere((b) => b['id'] == tappedBuildingId);
+      setState(() {
+        _highlightedBuilding = tappedBuildingId;
+        _selectedBuildingForNavigation = item;
+      });
+      _showNavigationModal(item);
+    }
   }
 
   void _showNavigationModal(Map<String, dynamic> item) {
@@ -481,7 +545,7 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
         child: TabBarView(
           controller: _tabController,
           children: [
-            // Tab 1: PBRU Map Visual
+            // Tab 1: PBRU Map Visual with Tap Gesture Detector
             SingleChildScrollView(
               padding: const EdgeInsets.all(20.0),
               child: Column(
@@ -525,7 +589,7 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
                   ),
                   const SizedBox(height: 20.0),
 
-                  // Map Render Container
+                  // Map Render Container with Tap Gesture Detection
                   Container(
                     width: double.infinity,
                     height: 380,
@@ -540,9 +604,14 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
                       borderRadius: BorderRadius.circular(20.0),
                       child: Stack(
                         children: [
-                          CustomPaint(
-                            size: const Size(double.infinity, 380),
-                            painter: _PBRUMapPainter(highlightedBuilding: _highlightedBuilding),
+                          GestureDetector(
+                            onTapUp: (details) {
+                              _handleCanvasTap(details, const Size(double.infinity, 380));
+                            },
+                            child: CustomPaint(
+                              size: const Size(double.infinity, 380),
+                              painter: _PBRUMapPainter(highlightedBuilding: _highlightedBuilding),
+                            ),
                           ),
                           Positioned(
                             top: 12,
@@ -557,9 +626,9 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
                               child: const Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(Icons.directions_rounded, size: 16, color: primaryColor),
+                                  Icon(Icons.touch_app_rounded, size: 16, color: primaryColor),
                                   SizedBox(width: 4),
-                                  Text('กดที่รายการอาคารเพื่อรับเส้นทาง', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: primaryColor)),
+                                  Text('กดที่อาคารเพื่อดูชื่อและรับเส้นทาง', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: primaryColor)),
                                 ],
                               ),
                             ),
@@ -697,6 +766,9 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
         onTap: () {
           setState(() {
             _highlightedBuilding = isSelected ? null : id;
+            if (_highlightedBuilding != null) {
+              _selectedBuildingForNavigation = _buildings.firstWhere((b) => b['id'] == id);
+            }
           });
         },
         child: Container(
@@ -721,7 +793,7 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
   }
 }
 
-// Custom Painter representing PBRU Campus Map Layout & Active Navigation Route
+// Custom Painter representing PBRU Campus Map Layout & Active Navigation Route for ALL buildings
 class _PBRUMapPainter extends CustomPainter {
   final int? highlightedBuilding;
 
@@ -777,15 +849,38 @@ class _PBRUMapPainter extends CustomPainter {
     _drawMarker(canvas, Offset(w * 0.08, h * 0.62), 'ประตู', Colors.red);
     _drawMarker(canvas, Offset(w * 0.08, h * 0.25), '7-11', Colors.orange);
 
-    // DRAW ACTIVE NAVIGATION ROUTE LINE IF A BUILDING IS SELECTED!
-    if (highlightedBuilding != null) {
-      final Offset startGate = Offset(w * 0.15, h * 0.60);
-      Offset destPos = Offset(w * 0.55, h * 0.52); // Default to Bldg 16
+    // Building Node Positions Map
+    final Map<int, Offset> nodePositions = {
+      1: Offset(w * 0.50, h * 0.82),
+      2: Offset(w * 0.42, h * 0.78),
+      3: Offset(w * 0.58, h * 0.50),
+      4: Offset(w * 0.42, h * 0.48),
+      5: Offset(w * 0.48, h * 0.52),
+      7: Offset(w * 0.55, h * 0.62),
+      8: Offset(w * 0.55, h * 0.88),
+      9: Offset(w * 0.70, h * 0.45),
+      10: Offset(w * 0.28, h * 0.32),
+      11: Offset(w * 0.85, h * 0.58),
+      12: Offset(w * 0.50, h * 0.32),
+      13: Offset(w * 0.58, h * 0.88),
+      14: Offset(w * 0.42, h * 0.38),
+      16: Offset(w * 0.55, h * 0.52),
+      17: Offset(w * 0.42, h * 0.22),
+      18: Offset(w * 0.50, h * 0.22),
+      19: Offset(w * 0.78, h * 0.82),
+      22: Offset(w * 0.82, h * 0.42),
+      23: Offset(w * 0.58, h * 0.22),
+      25: Offset(w * 0.60, h * 0.38),
+      26: Offset(w * 0.58, h * 0.10),
+      28: Offset(w * 0.58, h * 0.54),
+      29: Offset(w * 0.50, h * 0.10),
+      33: Offset(w * 0.58, h * 0.32),
+    };
 
-      if (highlightedBuilding == 8) destPos = Offset(w * 0.55, h * 0.88);
-      if (highlightedBuilding == 28) destPos = Offset(w * 0.58, h * 0.54);
-      if (highlightedBuilding == 1) destPos = Offset(w * 0.50, h * 0.82);
-      if (highlightedBuilding == 3) destPos = Offset(w * 0.58, h * 0.50);
+    // DRAW ACTIVE NAVIGATION ROUTE LINE IF ANY BUILDING IS SELECTED!
+    if (highlightedBuilding != null && nodePositions.containsKey(highlightedBuilding)) {
+      final Offset startGate = Offset(w * 0.15, h * 0.60);
+      final Offset destPos = nodePositions[highlightedBuilding]!;
 
       // Route Line
       final routePath = Path()
@@ -805,34 +900,14 @@ class _PBRUMapPainter extends CustomPainter {
       canvas.drawCircle(startGate, 8, Paint()..color = const Color(0xFFFF6B00));
     }
 
-    // PBRU Buildings
-    _drawBuildingNode(canvas, Offset(w * 0.50, h * 0.82), 1, '1');
-    _drawBuildingNode(canvas, Offset(w * 0.42, h * 0.78), 2, '2');
-    _drawBuildingNode(canvas, Offset(w * 0.58, h * 0.50), 3, '3');
-    _drawBuildingNode(canvas, Offset(w * 0.42, h * 0.48), 4, '4');
-    _drawBuildingNode(canvas, Offset(w * 0.48, h * 0.52), 5, '5');
-    _drawBuildingNode(canvas, Offset(w * 0.55, h * 0.62), 7, '7');
-
-    // ★ FACULTY OF ENGINEERING BUILDINGS (8, 16, 28)
-    _drawEngineeringBuilding(canvas, Offset(w * 0.55, h * 0.88), 8, '8');
-    _drawEngineeringBuilding(canvas, Offset(w * 0.55, h * 0.52), 16, '16');
-    _drawEngineeringBuilding(canvas, Offset(w * 0.58, h * 0.54), 28, '28');
-
-    _drawBuildingNode(canvas, Offset(w * 0.70, h * 0.45), 9, '9');
-    _drawBuildingNode(canvas, Offset(w * 0.28, h * 0.32), 10, '10');
-    _drawBuildingNode(canvas, Offset(w * 0.85, h * 0.58), 11, '11');
-    _drawBuildingNode(canvas, Offset(w * 0.50, h * 0.32), 12, '12');
-    _drawBuildingNode(canvas, Offset(w * 0.58, h * 0.88), 13, '13');
-    _drawBuildingNode(canvas, Offset(w * 0.42, h * 0.38), 14, '14');
-    _drawBuildingNode(canvas, Offset(w * 0.42, h * 0.22), 17, '17');
-    _drawBuildingNode(canvas, Offset(w * 0.50, h * 0.22), 18, '18');
-    _drawBuildingNode(canvas, Offset(w * 0.78, h * 0.82), 19, '19');
-    _drawBuildingNode(canvas, Offset(w * 0.82, h * 0.42), 22, '22');
-    _drawBuildingNode(canvas, Offset(w * 0.58, h * 0.22), 23, '23');
-    _drawBuildingNode(canvas, Offset(w * 0.60, h * 0.38), 25, '25');
-    _drawBuildingNode(canvas, Offset(w * 0.58, h * 0.10), 26, '26');
-    _drawBuildingNode(canvas, Offset(w * 0.50, h * 0.10), 29, '29');
-    _drawBuildingNode(canvas, Offset(w * 0.58, h * 0.32), 33, '33');
+    // Draw all building nodes
+    nodePositions.forEach((id, pos) {
+      if (id == 8 || id == 16 || id == 28) {
+        _drawEngineeringBuilding(canvas, pos, id, '$id');
+      } else {
+        _drawBuildingNode(canvas, pos, id, '$id');
+      }
+    });
   }
 
   void _drawMarker(Canvas canvas, Offset pos, String text, Color color) {

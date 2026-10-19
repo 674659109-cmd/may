@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:may/screens/campus_map.dart';
 
 class AppointmentDetailScreen extends StatelessWidget {
   final Map<String, dynamic> appointment;
@@ -205,8 +206,11 @@ class AppointmentDetailScreen extends StatelessWidget {
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('กำลังเปิดแผนที่นำทางอาคารวิศวกรรมศาสตร์')),
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const CampusMapScreen(initialBuildingId: 16),
+                          ),
                         );
                       },
                       icon: const Icon(Icons.navigation_rounded),
