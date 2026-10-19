@@ -6,6 +6,43 @@ class AppointmentDetailScreen extends StatelessWidget {
 
   const AppointmentDetailScreen({super.key, required this.appointment});
 
+  int _extractBuildingId(String location) {
+    if (location.contains('33')) return 33;
+    if (location.contains('32')) return 32;
+    if (location.contains('31')) return 31;
+    if (location.contains('30')) return 30;
+    if (location.contains('29')) return 29;
+    if (location.contains('28')) return 28;
+    if (location.contains('27')) return 27;
+    if (location.contains('26')) return 26;
+    if (location.contains('25')) return 25;
+    if (location.contains('24')) return 24;
+    if (location.contains('23')) return 23;
+    if (location.contains('22')) return 22;
+    if (location.contains('21')) return 21;
+    if (location.contains('20')) return 20;
+    if (location.contains('19')) return 19;
+    if (location.contains('18')) return 18;
+    if (location.contains('17')) return 17;
+    if (location.contains('16') || location.contains('วิศวกรรม')) return 16;
+    if (location.contains('15')) return 15;
+    if (location.contains('14')) return 14;
+    if (location.contains('13')) return 13;
+    if (location.contains('12')) return 12;
+    if (location.contains('11')) return 11;
+    if (location.contains('10')) return 10;
+    if (location.contains('9')) return 9;
+    if (location.contains('8')) return 8;
+    if (location.contains('7')) return 7;
+    if (location.contains('6')) return 6;
+    if (location.contains('5')) return 5;
+    if (location.contains('4')) return 4;
+    if (location.contains('3')) return 3;
+    if (location.contains('2')) return 2;
+    if (location.contains('1')) return 1;
+    return 16; // Default to building 16
+  }
+
   @override
   Widget build(BuildContext context) {
     const primaryColor = Color(0xFF4C52D4);
@@ -206,10 +243,12 @@ class AppointmentDetailScreen extends StatelessWidget {
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: () {
+                        final locationStr = appointment['location'] ?? '';
+                        final buildingId = _extractBuildingId(locationStr);
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const CampusMapScreen(initialBuildingId: 16),
+                            builder: (context) => CampusMapScreen(initialBuildingId: buildingId),
                           ),
                         );
                       },
