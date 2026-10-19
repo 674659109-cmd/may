@@ -47,7 +47,7 @@ class AppointmentItem {
 }
 
 class AppointmentData {
-  static List<AppointmentItem> appointments = [
+  static final ValueNotifier<List<AppointmentItem>> appointmentsNotifier = ValueNotifier([
     AppointmentItem(
       id: '1',
       title: 'นัดพบอาจารย์ที่ปรึกษา',
@@ -59,7 +59,7 @@ class AppointmentData {
       date: 'วันนี้ (24 พ.ค. 2567)',
       time: '10:30 - 11:30 น.',
       topic: 'ขอปรึกษาเรื่องหัวข้อโครงงานวิจัยและวิศวกรรมซอฟต์แวร์',
-      status: 'PENDING', // Default pending until lecturer approves!
+      status: 'PENDING',
     ),
     AppointmentItem(
       id: '2',
@@ -74,7 +74,9 @@ class AppointmentData {
       topic: 'ปรึกษาการเขียนโปรแกรม Flutter และระบบเซิร์ฟเวอร์',
       status: 'CONFIRMED',
     ),
-  ];
+  ]);
+
+  static List<AppointmentItem> get appointments => appointmentsNotifier.value;
 
   static List<Map<String, dynamic>> notifications = [
     {
@@ -86,8 +88,14 @@ class AppointmentData {
     },
   ];
 
+  static void addAppointment(AppointmentItem item) {
+    final updated = List<AppointmentItem>.from(appointmentsNotifier.value);
+    updated.insert(0, item);
+    appointmentsNotifier.value = updated;
+  }
+
   static void approveAppointment(String id) {
-    for (var app in appointments) {
+    final updated = appointmentsNotifier.value.map((app) {
       if (app.id == id) {
         app.status = 'CONFIRMED';
         notifications.insert(0, {
@@ -98,11 +106,13 @@ class AppointmentData {
           'type': 'SUCCESS',
         });
       }
-    }
+      return app;
+    }).toList();
+    appointmentsNotifier.value = updated;
   }
 
   static void rejectAppointment(String id) {
-    for (var app in appointments) {
+    final updated = appointmentsNotifier.value.map((app) {
       if (app.id == id) {
         app.status = 'CANCELLED';
         notifications.insert(0, {
@@ -113,10 +123,8 @@ class AppointmentData {
           'type': 'ALERT',
         });
       }
-    }
-  }
-
-  static void addAppointment(AppointmentItem item) {
-    appointments.insert(0, item);
+      return app;
+    }).toList();
+    appointmentsNotifier.value = updated;
   }
 }

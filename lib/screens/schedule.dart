@@ -27,9 +27,6 @@ class _ScheduleScreenState extends State<ScheduleScreen> with SingleTickerProvid
   @override
   Widget build(BuildContext context) {
     const primaryColor = Color(0xFF4C52D4);
-    final allList = AppointmentData.appointments;
-    final confirmedList = AppointmentData.appointments.where((a) => a.status == 'CONFIRMED').toList();
-    final pendingList = AppointmentData.appointments.where((a) => a.status == 'PENDING').toList();
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FE),
@@ -52,28 +49,31 @@ class _ScheduleScreenState extends State<ScheduleScreen> with SingleTickerProvid
           indicatorWeight: 3,
           labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
           tabs: [
-            Tab(text: 'ทั้งหมด (${allList.length})'),
-            Tab(text: 'ยืนยันแล้ว (${confirmedList.length})'),
-            Tab(text: 'รอดำเนินการ (${pendingList.length})'),
+            const Tab(text: 'ทั้งหมด'),
+            const Tab(text: 'ยืนยันแล้ว'),
+            const Tab(text: 'รอดำเนินการ'),
           ],
         ),
       ),
       body: SafeArea(
-        child: TabBarView(
-          controller: _tabController,
-          children: [
-            _buildAppointmentListView(filterStatus: 'ALL'),
-            _buildAppointmentListView(filterStatus: 'CONFIRMED'),
-            _buildAppointmentListView(filterStatus: 'PENDING'),
-          ],
+        child: ValueListenableBuilder<List<AppointmentItem>>(
+          valueListenable: AppointmentData.appointmentsNotifier,
+          builder: (context, appointments, child) {
+            return TabBarView(
+              controller: _tabController,
+              children: [
+                _buildAppointmentListView(appointments: appointments, filterStatus: 'ALL'),
+                _buildAppointmentListView(appointments: appointments, filterStatus: 'CONFIRMED'),
+                _buildAppointmentListView(appointments: appointments, filterStatus: 'PENDING'),
+              ],
+            );
+          },
         ),
       ),
     );
   }
 
-  Widget _buildAppointmentListView({required String filterStatus}) {
-    final List<AppointmentItem> appointments = AppointmentData.appointments;
-
+  Widget _buildAppointmentListView({required List<AppointmentItem> appointments, required String filterStatus}) {
     final filtered = filterStatus == 'ALL'
         ? appointments
         : appointments.where((item) => item.status == filterStatus).toList();
