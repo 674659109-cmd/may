@@ -19,9 +19,15 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
   String _appointmentType = 'นัดพบอาจารย์ที่ปรึกษา';
   late String _selectedMajor;
   String? _selectedLecturer;
+
+  // Separate Building, Floor, and Room Selection State
+  String _selectedBuilding = 'อาคาร 16 (อาคารหลักคณะวิศวกรรมศาสตร์ฯ)';
+  String _selectedFloor = 'ชั้น 3';
+  late String _selectedRoom;
+  final _customRoomController = TextEditingController();
+
   DateTime _selectedDate = DateTime.now().add(const Duration(days: 1));
   TimeOfDay _selectedTime = const TimeOfDay(hour: 10, minute: 30);
-  final _locationController = TextEditingController(text: 'อาคารวิศวกรรมศาสตร์ ชั้น 3 ห้อง 302');
   final _topicController = TextEditingController();
 
   final List<String> _types = [
@@ -87,6 +93,46 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
     ],
   };
 
+  final List<String> _buildingsList = [
+    'อาคาร 16 (อาคารหลักคณะวิศวกรรมศาสตร์ฯ)',
+    'อาคาร 8 (โรงช่างปฏิบัติการหุ่นยนต์และอุตสาหการ)',
+    'อาคาร 28 (อาคารใหม่คณะวิศวกรรมศาสตร์ฯ)',
+    'อาคาร 12 (สำนักวิทยบริการ/หอสมุดกลาง)',
+    'อาคาร 25 (นิวัตสโมสร Student Union)',
+  ];
+
+  final List<String> _floorsList = [
+    'ชั้น 1',
+    'ชั้น 2',
+    'ชั้น 3',
+    'ชั้น 4',
+  ];
+
+  final Map<String, List<String>> _roomsByFloor = {
+    'ชั้น 1': [
+      'ห้อง 101 (ห้องปฏิบัติการพื้นฐาน)',
+      'ห้อง 102 (ห้องสัมมนาประจำชั้น)',
+      'ระบุห้องอื่นด้วยตนเอง',
+    ],
+    'ชั้น 2': [
+      'ห้อง 201 (ห้องปฏิบัติการวิศวกรรมไฟฟ้า)',
+      'ห้อง 208 (ห้องปฏิบัติการวิศวกรรมอุตสาหการ)',
+      'ระบุห้องอื่นด้วยตนเอง',
+    ],
+    'ชั้น 3': [
+      'ห้อง 301 (ห้องประธานสาขาวิชา)',
+      'ห้อง 302 (AI & Comm Lab)',
+      'ห้อง 305 (Computer Graphics Lab)',
+      'ห้อง 308 (สำนักงานคณบดี)',
+      'ระบุห้องอื่นด้วยตนเอง',
+    ],
+    'ชั้น 4': [
+      'ห้อง 401 (ห้องบรรยายวิศวกรรมศาสตร์ 1)',
+      'ห้อง 402 (ห้องบรรยายวิศวกรรมศาสตร์ 2)',
+      'ระบุห้องอื่นด้วยตนเอง',
+    ],
+  };
+
   @override
   void initState() {
     super.initState();
@@ -100,11 +146,13 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
     } else {
       _selectedLecturer = available.isNotEmpty ? available.first : null;
     }
+
+    _selectedRoom = _roomsByFloor[_selectedFloor]!.first;
   }
 
   @override
   void dispose() {
-    _locationController.dispose();
+    _customRoomController.dispose();
     _topicController.dispose();
     super.dispose();
   }
@@ -157,6 +205,12 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
 
   void _submitAppointment() {
     if (_formKey.currentState!.validate()) {
+      final finalRoom = _selectedRoom == 'ระบุห้องอื่นด้วยตนเอง'
+          ? _customRoomController.text.trim()
+          : _selectedRoom;
+
+      final locationSummary = '$_selectedBuilding • $_selectedFloor • $finalRoom';
+
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -168,7 +222,7 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
               Text('ส่งคำขอนัดหมายแล้ว'),
             ],
           ),
-          content: Text('ส่งคำขอนัดหมายไปที่: $_selectedLecturer\nสาขา$_selectedMajor\nคณะวิศวกรรมศาสตร์ฯ เรียบร้อยแล้ว'),
+          content: Text('ส่งคำขอนัดหมายไปที่: $_selectedLecturer\nสาขา$_selectedMajor\n\nสถานที่: $locationSummary'),
           actions: [
             TextButton(
               onPressed: () {
@@ -187,6 +241,7 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
   Widget build(BuildContext context) {
     const primaryColor = Color(0xFF4C52D4);
     final availableLecturers = _lecturersByMajor[_selectedMajor] ?? [];
+    final availableRooms = _roomsByFloor[_selectedFloor] ?? [];
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFE),
@@ -307,6 +362,132 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
                 ),
                 const SizedBox(height: 20.0),
 
+                // SEPARATE LOCATION SECTION: BUILDING & FLOOR & ROOM
+                Container(
+                  padding: const EdgeInsets.all(16.0),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16.0),
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                    boxShadow: [
+                      BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 8, offset: const Offset(0, 3)),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Row(
+                        children: [
+                          Icon(Icons.location_on_rounded, color: primaryColor, size: 22),
+                          SizedBox(width: 8),
+                          Text(
+                            'ระบุสถานที่นัดพบ (เลือกตึกและชั้น)',
+                            style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: Color(0xFF1A202C)),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 14.0),
+
+                      // 1. Select Building
+                      const Text(
+                        '1. เลือกตึก / อาคาร',
+                        style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.bold, color: Color(0xFF4A5568)),
+                      ),
+                      const SizedBox(height: 6.0),
+                      DropdownButtonFormField<String>(
+                        initialValue: _selectedBuilding,
+                        isExpanded: true,
+                        decoration: InputDecoration(
+                          prefixIcon: const Icon(Icons.apartment_rounded, color: primaryColor),
+                          filled: true,
+                          fillColor: const Color(0xFFF7FAFC),
+                          contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 12.0),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.0), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+                          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.0), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+                        ),
+                        items: _buildingsList.map((b) => DropdownMenuItem(value: b, child: Text(b, style: const TextStyle(fontSize: 13.0), overflow: TextOverflow.ellipsis))).toList(),
+                        onChanged: (val) {
+                          if (val != null) setState(() => _selectedBuilding = val);
+                        },
+                      ),
+                      const SizedBox(height: 14.0),
+
+                      // 2. Select Floor
+                      const Text(
+                        '2. เลือกชั้น',
+                        style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.bold, color: Color(0xFF4A5568)),
+                      ),
+                      const SizedBox(height: 6.0),
+                      DropdownButtonFormField<String>(
+                        initialValue: _selectedFloor,
+                        isExpanded: true,
+                        decoration: InputDecoration(
+                          prefixIcon: const Icon(Icons.layers_outlined, color: primaryColor),
+                          filled: true,
+                          fillColor: const Color(0xFFF7FAFC),
+                          contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 12.0),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.0), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+                          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.0), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+                        ),
+                        items: _floorsList.map((f) => DropdownMenuItem(value: f, child: Text(f, style: const TextStyle(fontSize: 13.5)))).toList(),
+                        onChanged: (val) {
+                          if (val != null) {
+                            setState(() {
+                              _selectedFloor = val;
+                              _selectedRoom = _roomsByFloor[val]?.first ?? 'ห้องประจำชั้น';
+                            });
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 14.0),
+
+                      // 3. Select Room
+                      const Text(
+                        '3. เลือกห้องนัดพบ',
+                        style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.bold, color: Color(0xFF4A5568)),
+                      ),
+                      const SizedBox(height: 6.0),
+                      DropdownButtonFormField<String>(
+                        initialValue: _selectedRoom,
+                        isExpanded: true,
+                        decoration: InputDecoration(
+                          prefixIcon: const Icon(Icons.meeting_room_outlined, color: primaryColor),
+                          filled: true,
+                          fillColor: const Color(0xFFF7FAFC),
+                          contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 12.0),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.0), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+                          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.0), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+                        ),
+                        items: availableRooms.map((r) => DropdownMenuItem(value: r, child: Text(r, style: const TextStyle(fontSize: 13.0), overflow: TextOverflow.ellipsis))).toList(),
+                        onChanged: (val) {
+                          if (val != null) setState(() => _selectedRoom = val);
+                        },
+                      ),
+
+                      if (_selectedRoom == 'ระบุห้องอื่นด้วยตนเอง') ...[
+                        const SizedBox(height: 10.0),
+                        TextFormField(
+                          controller: _customRoomController,
+                          decoration: InputDecoration(
+                            hintText: 'กรอกหมายเลขห้อง (เช่น ห้อง 309)',
+                            filled: true,
+                            fillColor: const Color(0xFFF7FAFC),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.0), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+                            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.0), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+                          ),
+                          validator: (v) {
+                            if (_selectedRoom == 'ระบุห้องอื่นด้วยตนเอง' && (v == null || v.trim().isEmpty)) {
+                              return 'กรุณากรอกหมายเลขห้อง';
+                            }
+                            return null;
+                          },
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20.0),
+
                 // Date & Time Picker Row
                 Row(
                   children: [
@@ -383,26 +564,6 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
                       ),
                     ),
                   ],
-                ),
-                const SizedBox(height: 20.0),
-
-                // Location Field
-                const Text(
-                  'สถานที่นัดพบ',
-                  style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: Color(0xFF2D3748)),
-                ),
-                const SizedBox(height: 8.0),
-                TextFormField(
-                  controller: _locationController,
-                  decoration: InputDecoration(
-                    hintText: 'ระบุอาคาร/ห้องนัดหมาย',
-                    prefixIcon: const Icon(Icons.location_on_outlined, color: primaryColor),
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(14.0), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
-                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14.0), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
-                  ),
-                  validator: (v) => (v == null || v.trim().isEmpty) ? 'กรุณาระบุสถานที่นัดพบ' : null,
                 ),
                 const SizedBox(height: 20.0),
 

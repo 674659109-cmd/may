@@ -308,12 +308,18 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
     super.dispose();
   }
 
+  void _selectBuildingForRoute(Map<String, dynamic> item) {
+    setState(() {
+      _highlightedBuilding = item['id'];
+      _selectedBuildingForNavigation = item;
+    });
+  }
+
   void _handleCanvasTap(TapUpDetails details, Size mapSize) {
     final double w = mapSize.width;
     final double h = mapSize.height;
     final Offset tapOffset = details.localPosition;
 
-    // Building Node Coordinates Map
     final Map<int, Offset> nodePositions = {
       1: Offset(w * 0.50, h * 0.82),
       2: Offset(w * 0.42, h * 0.78),
@@ -342,7 +348,7 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
     };
 
     int? tappedBuildingId;
-    double minDistance = 35.0; // Tap detection radius
+    double minDistance = 35.0;
 
     nodePositions.forEach((id, pos) {
       final double dist = (tapOffset - pos).distance;
@@ -354,10 +360,7 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
 
     if (tappedBuildingId != null) {
       final item = _buildings.firstWhere((b) => b['id'] == tappedBuildingId);
-      setState(() {
-        _highlightedBuilding = tappedBuildingId;
-        _selectedBuildingForNavigation = item;
-      });
+      _selectBuildingForRoute(item);
       _showNavigationModal(item);
     }
   }
@@ -477,14 +480,11 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
                         child: ElevatedButton.icon(
                           onPressed: () {
                             Navigator.pop(context);
-                            setState(() {
-                              _highlightedBuilding = item['id'];
-                              _selectedBuildingForNavigation = item;
-                              _tabController.animateTo(0); // Switch to Map tab!
-                            });
+                            _selectBuildingForRoute(item);
+                            _tabController.animateTo(0); // Switch to Map tab!
                           },
                           icon: const Icon(Icons.navigation_rounded),
-                          label: const Text('นำทางบนแผนที่ PBRU', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                          label: const Text('วาดเส้นทางบนแผนที่ PBRU', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: primaryColor,
                             foregroundColor: Colors.white,
@@ -545,23 +545,31 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
         child: TabBarView(
           controller: _tabController,
           children: [
-            // Tab 1: PBRU Map Visual with Tap Gesture Detector
+            // Tab 1: PBRU Map Visual with Dynamic Route Line for ALL 24 Buildings
             SingleChildScrollView(
               padding: const EdgeInsets.all(20.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Engineering Highlight Banner
+                  // Engineering & Active Navigation Banner
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(16.0),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(colors: [primaryColor, Color(0xFF6B72E1)]),
+                      gradient: const LinearGradient(
+                        colors: [primaryColor, Color(0xFF38A169)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
                       borderRadius: BorderRadius.circular(16.0),
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.engineering_rounded, color: Colors.white, size: 28),
+                        Icon(
+                          _selectedBuildingForNavigation != null ? Icons.directions_run_rounded : Icons.engineering_rounded,
+                          color: Colors.white,
+                          size: 30,
+                        ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Column(
@@ -569,17 +577,18 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
                             children: [
                               Text(
                                 _selectedBuildingForNavigation != null
-                                    ? 'นำทางไป: ${_selectedBuildingForNavigation!['name']}'
-                                    : 'คณะวิศวกรรมศาสตร์และเทคโนโลยีอุตสาหกรรม',
-                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14.0),
+                                    ? 'กำลังนำทางไป: อาคาร ${_selectedBuildingForNavigation!['id']}'
+                                    : 'เลือกอาคารเพื่อนำทาง (รองรับทุกหมายเลขอาคาร)',
+                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15.0),
                                 overflow: TextOverflow.ellipsis,
                               ),
                               const SizedBox(height: 2),
                               Text(
                                 _selectedBuildingForNavigation != null
-                                    ? 'ระยะทาง: ${_selectedBuildingForNavigation!['distance']} • เดิน ${_selectedBuildingForNavigation!['time']}'
-                                    : 'อาคารหมายเลข: 16 (อาคารหลัก), 8 (โรงช่างหุ่นยนต์), 28 (อาคารใหม่)',
+                                    ? '${_selectedBuildingForNavigation!['name']} (${_selectedBuildingForNavigation!['distance']})'
+                                    : 'กดที่ปุ่มตัวเลขอาคารด้านล่าง หรือแตะบนแผนที่เพื่อวาดเส้นทางสีส้ม',
                                 style: const TextStyle(color: Color(0xFFE0E5FF), fontSize: 12.0),
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ],
                           ),
@@ -589,7 +598,7 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
                   ),
                   const SizedBox(height: 20.0),
 
-                  // Map Render Container with Tap Gesture Detection
+                  // Map Render Container
                   Container(
                     width: double.infinity,
                     height: 380,
@@ -626,9 +635,9 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
                               child: const Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(Icons.touch_app_rounded, size: 16, color: primaryColor),
+                                  Icon(Icons.alt_route_rounded, size: 16, color: primaryColor),
                                   SizedBox(width: 4),
-                                  Text('กดที่อาคารเพื่อดูชื่อและรับเส้นทาง', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: primaryColor)),
+                                  Text('เส้นทางสีส้มนำทางเรียลไทม์', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: primaryColor)),
                                 ],
                               ),
                             ),
@@ -639,17 +648,62 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
                   ),
                   const SizedBox(height: 20.0),
 
-                  // Engineering Quick Focus Chips
-                  const Text('ตำแหน่งอาคารคณะวิศวกรรมศาสตร์ฯ:', style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: Color(0xFF2D3748))),
-                  const SizedBox(height: 10.0),
+                  // QUICK SELECTION BUTTONS FOR ALL 24 BUILDINGS
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _buildBuildingBadge(16, 'อาคาร 16 (หลัก)', primaryColor),
-                      const SizedBox(width: 8),
-                      _buildBuildingBadge(8, 'อาคาร 8 (หุ่นยนต์/อุตสาหการ)', const Color(0xFFDD6B20)),
-                      const SizedBox(width: 8),
-                      _buildBuildingBadge(28, 'อาคาร 28 (ใหม่)', const Color(0xFF38A169)),
+                      const Text(
+                        'เลือกอาคารเพื่อวาดเส้นทางนำทาง:',
+                        style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: Color(0xFF2D3748)),
+                      ),
+                      if (_highlightedBuilding != null)
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _highlightedBuilding = null;
+                              _selectedBuildingForNavigation = null;
+                            });
+                          },
+                          child: const Text('ล้างเส้นทาง', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 13)),
+                        ),
                     ],
+                  ),
+                  const SizedBox(height: 10.0),
+
+                  // Scrollable Grid of Building Quick Buttons for ALL 24 Buildings
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: _buildings.map((b) {
+                        final int id = b['id'];
+                        final bool isSelected = _highlightedBuilding == id;
+                        final bool isEng = b['isEng'];
+
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          child: ChoiceChip(
+                            label: Text(
+                              'อาคาร $id ${isEng ? "★" : ""}',
+                              style: TextStyle(
+                                color: isSelected ? Colors.white : (isEng ? primaryColor : const Color(0xFF2D3748)),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                              ),
+                            ),
+                            selected: isSelected,
+                            onSelected: (selected) {
+                              _selectBuildingForRoute(b);
+                            },
+                            selectedColor: const Color(0xFFFF6B00), // Orange navigation highlight
+                            backgroundColor: isEng ? primaryColor.withOpacity(0.12) : const Color(0xFFEDF2F7),
+                            side: BorderSide(
+                              color: isEng ? primaryColor : const Color(0xFFCBD5E0),
+                              width: isEng ? 1.5 : 1.0,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
                   ),
                 ],
               ),
@@ -688,6 +742,7 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
 
                       return GestureDetector(
                         onTap: () {
+                          _selectBuildingForRoute(item);
                           _showNavigationModal(item);
                         },
                         child: Container(
@@ -742,7 +797,7 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
                                   ],
                                 ),
                               ),
-                              const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: primaryColor),
+                              const Icon(Icons.navigation_rounded, size: 20, color: Color(0xFFFF6B00)),
                             ],
                           ),
                         ),
@@ -757,43 +812,9 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
       ),
     );
   }
-
-  Widget _buildBuildingBadge(int id, String title, Color color) {
-    final bool isSelected = _highlightedBuilding == id;
-
-    return Expanded(
-      child: GestureDetector(
-        onTap: () {
-          setState(() {
-            _highlightedBuilding = isSelected ? null : id;
-            if (_highlightedBuilding != null) {
-              _selectedBuildingForNavigation = _buildings.firstWhere((b) => b['id'] == id);
-            }
-          });
-        },
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-          decoration: BoxDecoration(
-            color: isSelected ? color : color.withOpacity(0.12),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: color, width: 1.5),
-          ),
-          child: Text(
-            title,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 12.0,
-              fontWeight: FontWeight.bold,
-              color: isSelected ? Colors.white : color,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 }
 
-// Custom Painter representing PBRU Campus Map Layout & Active Navigation Route for ALL buildings
+// Custom Painter representing PBRU Campus Map Layout & Active Navigation Route for ALL 24 buildings
 class _PBRUMapPainter extends CustomPainter {
   final int? highlightedBuilding;
 
@@ -849,7 +870,7 @@ class _PBRUMapPainter extends CustomPainter {
     _drawMarker(canvas, Offset(w * 0.08, h * 0.62), 'ประตู', Colors.red);
     _drawMarker(canvas, Offset(w * 0.08, h * 0.25), '7-11', Colors.orange);
 
-    // Building Node Positions Map
+    // Complete Node Positions Map for ALL 24 Buildings
     final Map<int, Offset> nodePositions = {
       1: Offset(w * 0.50, h * 0.82),
       2: Offset(w * 0.42, h * 0.78),
@@ -877,30 +898,32 @@ class _PBRUMapPainter extends CustomPainter {
       33: Offset(w * 0.58, h * 0.32),
     };
 
-    // DRAW ACTIVE NAVIGATION ROUTE LINE IF ANY BUILDING IS SELECTED!
+    // DRAW ORANGE DIRECT ROUTE LINE FOR ANY SELECTED BUILDING (ALL 24 BUILDINGS SUPPORTED!)
     if (highlightedBuilding != null && nodePositions.containsKey(highlightedBuilding)) {
       final Offset startGate = Offset(w * 0.15, h * 0.60);
       final Offset destPos = nodePositions[highlightedBuilding]!;
 
-      // Route Line
+      // Route Path Calculation
       final routePath = Path()
         ..moveTo(startGate.dx, startGate.dy)
         ..lineTo(w * 0.38, h * 0.60)
         ..lineTo(destPos.dx, destPos.dy);
 
       final routePaint = Paint()
-        ..color = const Color(0xFFFF6B00)
+        ..color = const Color(0xFFFF6B00) // Vibrant Orange Route
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 6
+        ..strokeWidth = 7
         ..strokeCap = StrokeCap.round;
 
       canvas.drawPath(routePath, routePaint);
 
-      // Start Pulse Circle
+      // Start Pulse Circle at Gate
       canvas.drawCircle(startGate, 8, Paint()..color = const Color(0xFFFF6B00));
+      // End Target Circle at Destination
+      canvas.drawCircle(destPos, 10, Paint()..color = const Color(0xFFFF6B00));
     }
 
-    // Draw all building nodes
+    // Draw all 24 building nodes
     nodePositions.forEach((id, pos) {
       if (id == 8 || id == 16 || id == 28) {
         _drawEngineeringBuilding(canvas, pos, id, '$id');
@@ -922,7 +945,7 @@ class _PBRUMapPainter extends CustomPainter {
   void _drawBuildingNode(Canvas canvas, Offset pos, int id, String label) {
     final bool isSelected = highlightedBuilding == id;
 
-    final bgPaint = Paint()..color = isSelected ? const Color(0xFF38A169) : const Color(0xFFE53E3E);
+    final bgPaint = Paint()..color = isSelected ? const Color(0xFFFF6B00) : const Color(0xFFE53E3E);
     canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromCenter(center: pos, width: 22, height: 18), const Radius.circular(4)), bgPaint);
 
     final textPainter = TextPainter(
@@ -935,8 +958,8 @@ class _PBRUMapPainter extends CustomPainter {
   void _drawEngineeringBuilding(Canvas canvas, Offset pos, int id, String label) {
     final bool isSelected = highlightedBuilding == id;
 
-    // Glowing Star/Badge for Engineering
-    final bgPaint = Paint()..color = isSelected ? const Color(0xFF38A169) : const Color(0xFF4C52D4);
+    // Glowing Badge for Engineering
+    final bgPaint = Paint()..color = isSelected ? const Color(0xFFFF6B00) : const Color(0xFF4C52D4);
     canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromCenter(center: pos, width: 26, height: 22), const Radius.circular(6)), bgPaint);
 
     final borderPaint = Paint()
