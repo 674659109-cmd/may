@@ -15,6 +15,7 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
   int? _highlightedBuilding;
   Map<String, dynamic>? _selectedBuildingForNavigation;
 
+  // Complete List of ALL 33 Buildings in PBRU Campus Map Table
   final List<Map<String, dynamic>> _buildings = [
     {
       'id': 1,
@@ -72,6 +73,17 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
       'steps': [
         '1. จากประตูทางเข้า เดินตรงเข้าสู่อาคารทางเชื่อมคณะเทคโนโลยีสารสนเทศ',
         '2. ถึงจุดหมายปลายทาง อาคาร 5',
+      ],
+    },
+    {
+      'id': 6,
+      'name': 'อาคารศูนย์ส่งเสริมการวิจัยและบริการวิชาการ',
+      'isEng': false,
+      'distance': '210 เมตร',
+      'time': '2.5 นาที',
+      'steps': [
+        '1. จากประตูทางเข้า เลี้ยวซ้ายเข้าสู่อาคารส่งเสริมวิจัย',
+        '2. ถึงจุดหมายปลายทาง อาคาร 6',
       ],
     },
     {
@@ -164,6 +176,17 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
       ],
     },
     {
+      'id': 15,
+      'name': 'อาคารอำนวยการและศูนย์เรียนรู้',
+      'isEng': false,
+      'distance': '290 เมตร',
+      'time': '3.5 นาที',
+      'steps': [
+        '1. จากประตูทางเข้า ตรงไปทางศูนย์เรียนรู้อาคารอำนวยการ',
+        '2. ถึงจุดหมายปลายทาง อาคาร 15',
+      ],
+    },
+    {
       'id': 16,
       'name': 'อาคารคณะวิศวกรรมศาสตร์และเทคโนโลยีอุตสาหกรรม (อาคารหลัก)',
       'isEng': true,
@@ -209,6 +232,28 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
       ],
     },
     {
+      'id': 20,
+      'name': 'อาคารโรงฝึกงานอุตสาหกรรมศิลป์',
+      'isEng': false,
+      'distance': '410 เมตร',
+      'time': '5 นาที',
+      'steps': [
+        '1. จากประตูทางเข้า ตรงไปทางโรงฝึกงานอุตสาหกรรมศิลป์',
+        '2. ถึงจุดหมายปลายทาง อาคาร 20',
+      ],
+    },
+    {
+      'id': 21,
+      'name': 'อาคารปฏิบัติการคหกรรมศาสตร์',
+      'isEng': false,
+      'distance': '430 เมตร',
+      'time': '5.5 นาที',
+      'steps': [
+        '1. จากประตูทางเข้า ตรงไปทางอาคารคหกรรมศาสตร์',
+        '2. ถึงจุดหมายปลายทาง อาคาร 21',
+      ],
+    },
+    {
       'id': 22,
       'name': 'อาคารสุเมธตันติเวชกุล',
       'isEng': false,
@@ -231,6 +276,17 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
       ],
     },
     {
+      'id': 24,
+      'name': 'อาคารนวัตกรรมการเรียนรู้',
+      'isEng': false,
+      'distance': '370 เมตร',
+      'time': '4.5 นาที',
+      'steps': [
+        '1. จากประตูทางเข้า ตรงไปทางนวัตกรรมการเรียนรู้',
+        '2. ถึงจุดหมายปลายทาง อาคาร 24',
+      ],
+    },
+    {
       'id': 25,
       'name': 'อาคารนิวัตสโมสร (Student Union)',
       'isEng': false,
@@ -250,6 +306,17 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
       'steps': [
         '1. จากประตูทางเข้า ตรงไปทางอาคารราชพฤกษ์ คณะเทคโนโลยีสารสนเทศ',
         '2. ถึงจุดหมายปลายทาง อาคาร 26',
+      ],
+    },
+    {
+      'id': 27,
+      'name': 'อาคารศูนย์สุขภาพและกีฬา',
+      'isEng': false,
+      'distance': '460 เมตร',
+      'time': '5.5 นาที',
+      'steps': [
+        '1. จากประตูทางเข้า ตรงไปทางโซนศูนย์สุขภาพและศูนย์กีฬา',
+        '2. ถึงจุดหมายปลายทาง อาคาร 27',
       ],
     },
     {
@@ -276,6 +343,39 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
       ],
     },
     {
+      'id': 30,
+      'name': 'อาคารหอพักนักศึกษา 1',
+      'isEng': false,
+      'distance': '410 เมตร',
+      'time': '5 นาที',
+      'steps': [
+        '1. จากประตูทางเข้า ตรงไปทางเขตหอพักนักศึกษาชาย/หญิง 1',
+        '2. ถึงจุดหมายปลายทาง อาคาร 30',
+      ],
+    },
+    {
+      'id': 31,
+      'name': 'อาคารหอพักนักศึกษา 2',
+      'isEng': false,
+      'distance': '420 เมตร',
+      'time': '5 นาที',
+      'steps': [
+        '1. จากประตูทางเข้า ตรงไปทางเขตหอพักนักศึกษา 2',
+        '2. ถึงจุดหมายปลายทาง อาคาร 31',
+      ],
+    },
+    {
+      'id': 32,
+      'name': 'อาคารโรงอาหารกลาง',
+      'isEng': false,
+      'distance': '270 เมตร',
+      'time': '3.5 นาที',
+      'steps': [
+        '1. จากประตูทางเข้า ตรงไปทางอาคารโรงอาหารกลางมหาวิทยาลัย',
+        '2. ถึงจุดหมายปลายทาง อาคาร 32',
+      ],
+    },
+    {
       'id': 33,
       'name': 'อาคารสถาบันช่างเมืองเพชรและศิลปะร่วมสมัย',
       'isEng': false,
@@ -297,7 +397,7 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
       _highlightedBuilding = widget.initialBuildingId;
       _selectedBuildingForNavigation = _buildings.firstWhere(
         (b) => b['id'] == widget.initialBuildingId,
-        orElse: () => _buildings[13], // default to Bldg 16
+        orElse: () => _buildings[15], // default to Bldg 16
       );
     }
   }
@@ -326,6 +426,7 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
       3: Offset(w * 0.58, h * 0.50),
       4: Offset(w * 0.42, h * 0.48),
       5: Offset(w * 0.48, h * 0.52),
+      6: Offset(w * 0.35, h * 0.52),
       7: Offset(w * 0.55, h * 0.62),
       8: Offset(w * 0.55, h * 0.88),
       9: Offset(w * 0.70, h * 0.45),
@@ -334,16 +435,24 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
       12: Offset(w * 0.50, h * 0.32),
       13: Offset(w * 0.58, h * 0.88),
       14: Offset(w * 0.42, h * 0.38),
+      15: Offset(w * 0.48, h * 0.38),
       16: Offset(w * 0.55, h * 0.52),
       17: Offset(w * 0.42, h * 0.22),
       18: Offset(w * 0.50, h * 0.22),
       19: Offset(w * 0.78, h * 0.82),
+      20: Offset(w * 0.70, h * 0.88),
+      21: Offset(w * 0.75, h * 0.75),
       22: Offset(w * 0.82, h * 0.42),
       23: Offset(w * 0.58, h * 0.22),
+      24: Offset(w * 0.65, h * 0.22),
       25: Offset(w * 0.60, h * 0.38),
       26: Offset(w * 0.58, h * 0.10),
+      27: Offset(w * 0.78, h * 0.10),
       28: Offset(w * 0.58, h * 0.54),
       29: Offset(w * 0.50, h * 0.10),
+      30: Offset(w * 0.38, h * 0.10),
+      31: Offset(w * 0.32, h * 0.10),
+      32: Offset(w * 0.42, h * 0.10),
       33: Offset(w * 0.58, h * 0.32),
     };
 
@@ -421,7 +530,7 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              item['name'],
+                              'อาคาร ${item['id']}: ${item['name']}',
                               style: TextStyle(
                                 fontSize: 16.0,
                                 fontWeight: FontWeight.bold,
@@ -537,7 +646,7 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
           labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
           tabs: const [
             Tab(text: 'ผังแผนที่ PBRU Map'),
-            Tab(text: 'รายชื่ออาคารมหาวิทยาลัย'),
+            Tab(text: 'รายชื่ออาคารมหาวิทยาลัย (33 ตึก)'),
           ],
         ),
       ),
@@ -545,7 +654,7 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
         child: TabBarView(
           controller: _tabController,
           children: [
-            // Tab 1: PBRU Map Visual with Dynamic Route Line for ALL 24 Buildings
+            // Tab 1: PBRU Map Visual with Dynamic Route Line for ALL 33 Buildings
             SingleChildScrollView(
               padding: const EdgeInsets.all(20.0),
               child: Column(
@@ -577,16 +686,16 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
                             children: [
                               Text(
                                 _selectedBuildingForNavigation != null
-                                    ? 'กำลังนำทางไป: อาคาร ${_selectedBuildingForNavigation!['id']}'
-                                    : 'เลือกอาคารเพื่อนำทาง (รองรับทุกหมายเลขอาคาร)',
-                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15.0),
+                                    ? 'กำลังนำทางไป: อาคาร ${_selectedBuildingForNavigation!['id']} ${_selectedBuildingForNavigation!['name']}'
+                                    : 'รองรับนำทางครบทั้ง 33 อาคาร มรภ.เพชรบุรี',
+                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14.0),
                                 overflow: TextOverflow.ellipsis,
                               ),
                               const SizedBox(height: 2),
                               Text(
                                 _selectedBuildingForNavigation != null
-                                    ? '${_selectedBuildingForNavigation!['name']} (${_selectedBuildingForNavigation!['distance']})'
-                                    : 'กดที่ปุ่มตัวเลขอาคารด้านล่าง หรือแตะบนแผนที่เพื่อวาดเส้นทางสีส้ม',
+                                    ? 'ระยะทาง: ${_selectedBuildingForNavigation!['distance']} • เดิน ${_selectedBuildingForNavigation!['time']}'
+                                    : 'กดที่ปุ่มหมายเลขอสคาร หรือแตะบนผังแผนที่เพื่อนำทางไปทุกตึก',
                                 style: const TextStyle(color: Color(0xFFE0E5FF), fontSize: 12.0),
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -619,7 +728,10 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
                             },
                             child: CustomPaint(
                               size: const Size(double.infinity, 380),
-                              painter: _PBRUMapPainter(highlightedBuilding: _highlightedBuilding),
+                              painter: _PBRUMapPainter(
+                                highlightedBuilding: _highlightedBuilding,
+                                buildingName: _selectedBuildingForNavigation?['name'],
+                              ),
                             ),
                           ),
                           Positioned(
@@ -637,7 +749,7 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
                                 children: [
                                   Icon(Icons.alt_route_rounded, size: 16, color: primaryColor),
                                   SizedBox(width: 4),
-                                  Text('เส้นทางสีส้มนำทางเรียลไทม์', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: primaryColor)),
+                                  Text('เส้นทางนำทางไปได้ทั้ง 33 ตึก', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: primaryColor)),
                                 ],
                               ),
                             ),
@@ -648,12 +760,12 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
                   ),
                   const SizedBox(height: 20.0),
 
-                  // QUICK SELECTION BUTTONS FOR ALL 24 BUILDINGS
+                  // QUICK SELECTION BUTTONS FOR ALL 33 BUILDINGS
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(
-                        'เลือกอาคารเพื่อวาดเส้นทางนำทาง:',
+                        'เลือกอาคารนำทาง (มีครบทั้ง 33 ตึก):',
                         style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: Color(0xFF2D3748)),
                       ),
                       if (_highlightedBuilding != null)
@@ -670,7 +782,7 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
                   ),
                   const SizedBox(height: 10.0),
 
-                  // Scrollable Grid of Building Quick Buttons for ALL 24 Buildings
+                  // Scrollable Grid of Building Quick Buttons for ALL 33 Buildings
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
@@ -694,7 +806,7 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
                             onSelected: (selected) {
                               _selectBuildingForRoute(b);
                             },
-                            selectedColor: const Color(0xFFFF6B00), // Orange navigation highlight
+                            selectedColor: const Color(0xFFFF6B00),
                             backgroundColor: isEng ? primaryColor.withOpacity(0.12) : const Color(0xFFEDF2F7),
                             side: BorderSide(
                               color: isEng ? primaryColor : const Color(0xFFCBD5E0),
@@ -709,7 +821,7 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
               ),
             ),
 
-            // Tab 2: Searchable Building Directory Table
+            // Tab 2: Searchable Building Directory Table (33 Buildings Complete)
             Column(
               children: [
                 Container(
@@ -722,7 +834,7 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
                       });
                     },
                     decoration: InputDecoration(
-                      hintText: 'ค้นหาด้วยชื่ออาคาร หรือ หมายเลขอาคาร...',
+                      hintText: 'ค้นหาชื่ออาคาร หรือ หมายเลขอาคาร (1-33)...',
                       prefixIcon: const Icon(Icons.search_rounded, color: primaryColor),
                       filled: true,
                       fillColor: const Color(0xFFF7FAFC),
@@ -776,7 +888,7 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      item['name'],
+                                      'อาคาร ${item['id']}: ${item['name']}',
                                       style: TextStyle(
                                         fontSize: 14.5,
                                         fontWeight: isEng ? FontWeight.bold : FontWeight.w600,
@@ -814,11 +926,12 @@ class _CampusMapScreenState extends State<CampusMapScreen> with SingleTickerProv
   }
 }
 
-// Custom Painter representing PBRU Campus Map Layout & Active Navigation Route for ALL 24 buildings
+// Custom Painter representing PBRU Campus Map Layout & Active Navigation Route for ALL 33 buildings
 class _PBRUMapPainter extends CustomPainter {
   final int? highlightedBuilding;
+  final String? buildingName;
 
-  _PBRUMapPainter({this.highlightedBuilding});
+  _PBRUMapPainter({this.highlightedBuilding, this.buildingName});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -870,13 +983,14 @@ class _PBRUMapPainter extends CustomPainter {
     _drawMarker(canvas, Offset(w * 0.08, h * 0.62), 'ประตู', Colors.red);
     _drawMarker(canvas, Offset(w * 0.08, h * 0.25), '7-11', Colors.orange);
 
-    // Complete Node Positions Map for ALL 24 Buildings
+    // Complete Node Positions Map for ALL 33 Buildings (From 1 to 33)
     final Map<int, Offset> nodePositions = {
       1: Offset(w * 0.50, h * 0.82),
       2: Offset(w * 0.42, h * 0.78),
       3: Offset(w * 0.58, h * 0.50),
       4: Offset(w * 0.42, h * 0.48),
       5: Offset(w * 0.48, h * 0.52),
+      6: Offset(w * 0.35, h * 0.52),
       7: Offset(w * 0.55, h * 0.62),
       8: Offset(w * 0.55, h * 0.88),
       9: Offset(w * 0.70, h * 0.45),
@@ -885,20 +999,28 @@ class _PBRUMapPainter extends CustomPainter {
       12: Offset(w * 0.50, h * 0.32),
       13: Offset(w * 0.58, h * 0.88),
       14: Offset(w * 0.42, h * 0.38),
+      15: Offset(w * 0.48, h * 0.38),
       16: Offset(w * 0.55, h * 0.52),
       17: Offset(w * 0.42, h * 0.22),
       18: Offset(w * 0.50, h * 0.22),
       19: Offset(w * 0.78, h * 0.82),
+      20: Offset(w * 0.70, h * 0.88),
+      21: Offset(w * 0.75, h * 0.75),
       22: Offset(w * 0.82, h * 0.42),
       23: Offset(w * 0.58, h * 0.22),
+      24: Offset(w * 0.65, h * 0.22),
       25: Offset(w * 0.60, h * 0.38),
       26: Offset(w * 0.58, h * 0.10),
+      27: Offset(w * 0.78, h * 0.10),
       28: Offset(w * 0.58, h * 0.54),
       29: Offset(w * 0.50, h * 0.10),
+      30: Offset(w * 0.38, h * 0.10),
+      31: Offset(w * 0.32, h * 0.10),
+      32: Offset(w * 0.42, h * 0.10),
       33: Offset(w * 0.58, h * 0.32),
     };
 
-    // DRAW ORANGE DIRECT ROUTE LINE FOR ANY SELECTED BUILDING (ALL 24 BUILDINGS SUPPORTED!)
+    // DRAW ORANGE DIRECT ROUTE LINE FOR ANY SELECTED BUILDING (ALL 33 BUILDINGS SUPPORTED!)
     if (highlightedBuilding != null && nodePositions.containsKey(highlightedBuilding)) {
       final Offset startGate = Offset(w * 0.15, h * 0.60);
       final Offset destPos = nodePositions[highlightedBuilding]!;
@@ -921,9 +1043,36 @@ class _PBRUMapPainter extends CustomPainter {
       canvas.drawCircle(startGate, 8, Paint()..color = const Color(0xFFFF6B00));
       // End Target Circle at Destination
       canvas.drawCircle(destPos, 10, Paint()..color = const Color(0xFFFF6B00));
+
+      // Draw Name Callout Banner above Destination Node
+      if (buildingName != null) {
+        final textPainter = TextPainter(
+          text: TextSpan(
+            text: 'อาคาร $highlightedBuilding: $buildingName',
+            style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+          ),
+          textDirection: TextDirection.ltr,
+        )..layout();
+
+        final bannerRect = Rect.fromCenter(
+          center: Offset(destPos.dx, destPos.dy - 22),
+          width: textPainter.width + 12,
+          height: 18,
+        );
+
+        canvas.drawRRect(
+          RRect.fromRectAndRadius(bannerRect, const Radius.circular(6)),
+          Paint()..color = const Color(0xFFFF6B00),
+        );
+
+        textPainter.paint(
+          canvas,
+          Offset(destPos.dx - textPainter.width / 2, destPos.dy - 31),
+        );
+      }
     }
 
-    // Draw all 24 building nodes
+    // Draw all 33 building nodes
     nodePositions.forEach((id, pos) {
       if (id == 8 || id == 16 || id == 28) {
         _drawEngineeringBuilding(canvas, pos, id, '$id');
