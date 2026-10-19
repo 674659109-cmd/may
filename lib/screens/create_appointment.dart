@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:may/models/appointment_data.dart';
+import 'package:may/models/user_data.dart';
 
 class CreateAppointmentScreen extends StatefulWidget {
   final String? initialMajor;
@@ -211,6 +213,24 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
 
       final locationSummary = '$_selectedBuilding • $_selectedFloor • $finalRoom';
 
+      // Create new AppointmentItem object
+      final newAppointment = AppointmentItem(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        title: _appointmentType,
+        person: _selectedLecturer ?? 'อาจารย์ประจำสาขาวิชา',
+        studentName: UserData.name,
+        studentId: UserData.studentId,
+        major: _selectedMajor,
+        location: locationSummary,
+        date: '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year + 543}',
+        time: _selectedTime.format(context),
+        topic: _topicController.text.trim(),
+        status: 'PENDING', // Starts as Pending until lecturer approves!
+      );
+
+      // Add to global state store
+      AppointmentData.addAppointment(newAppointment);
+
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -219,15 +239,17 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
             children: [
               Icon(Icons.check_circle_rounded, color: Color(0xFF38A169), size: 28),
               SizedBox(width: 8),
-              Text('ส่งคำขอนัดหมายแล้ว'),
+              Text('สร้างนัดหมายสำเร็จ!'),
             ],
           ),
-          content: Text('ส่งคำขอนัดหมายไปที่: $_selectedLecturer\nสาขา$_selectedMajor\n\nสถานที่: $locationSummary'),
+          content: Text(
+            'ส่งคำขอนัดหมายไปที่: $_selectedLecturer\nสาขา$_selectedMajor\n\nสถานที่: $locationSummary\n\nคำขอของคุณจะถูกส่งไปยังระบบของอาจารย์ทันที!',
+          ),
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.pop(context);
-                Navigator.pop(context);
+                Navigator.pop(context); // Close dialog
+                Navigator.pop(context, true); // Return true to home screen!
               },
               child: const Text('ตกลง', style: TextStyle(color: Color(0xFF4C52D4), fontWeight: FontWeight.bold)),
             ),
