@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:may/models/appointment_data.dart';
 import 'package:may/screens/login.dart';
 
 class LecturerHomeScreen extends StatefulWidget {
@@ -9,32 +10,11 @@ class LecturerHomeScreen extends StatefulWidget {
 }
 
 class _LecturerHomeScreenState extends State<LecturerHomeScreen> {
-  final List<Map<String, dynamic>> _pendingRequests = [
-    {
-      'id': '1',
-      'studentName': 'นายสมชาย ใจดี',
-      'studentId': '674659109',
-      'major': 'วิศวกรรมสารสนเทศและการสื่อสาร',
-      'topic': 'ขอคำปรึกษาเรื่องหัวข้อโครงงานวิจัยและวิศวกรรมซอฟต์แวร์',
-      'date': 'วันนี้ (24 พ.ค. 2567)',
-      'time': '10:30 - 11:30 น.',
-      'location': 'อาคารวิศวกรรมศาสตร์ ชั้น 3 ห้อง 301',
-    },
-    {
-      'id': '2',
-      'studentName': 'นายวิชัย เรียนดี',
-      'studentId': '674659115',
-      'major': 'วิศวกรรมสารสนเทศและการสื่อสาร',
-      'topic': 'ขอยื่นเอกสารฝึกงานภาคฤดูร้อน',
-      'date': '26 พ.ค. 2567',
-      'time': '13:30 - 14:30 น.',
-      'location': 'อาคารวิศวกรรมศาสตร์ ชั้น 3 ห้อง 301',
-    },
-  ];
-
   @override
   Widget build(BuildContext context) {
     const primaryColor = Color(0xFF4C52D4);
+    final pendingRequests = AppointmentData.appointments.where((a) => a.status == 'PENDING').toList();
+    final confirmedCount = AppointmentData.appointments.where((a) => a.status == 'CONFIRMED').length;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FE),
@@ -151,7 +131,7 @@ class _LecturerHomeScreenState extends State<LecturerHomeScreen> {
                             borderRadius: BorderRadius.circular(10.0),
                           ),
                           child: Text(
-                            'รอดำเนินการ: ${_pendingRequests.length} รายการ',
+                            'รอดำเนินการ: ${pendingRequests.length} รายการ',
                             style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13.0),
                           ),
                         ),
@@ -162,9 +142,9 @@ class _LecturerHomeScreenState extends State<LecturerHomeScreen> {
                             color: const Color(0xFF38A169).withOpacity(0.8),
                             borderRadius: BorderRadius.circular(10.0),
                           ),
-                          child: const Text(
-                            'นัดวันนี้: 1 รายการ',
-                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13.0),
+                          child: Text(
+                            'อนุมัติแล้ว: $confirmedCount รายการ',
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13.0),
                           ),
                         ),
                       ],
@@ -179,14 +159,14 @@ class _LecturerHomeScreenState extends State<LecturerHomeScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'คำขอนัดหมายรอดำเนินการ (${_pendingRequests.length})',
+                    'คำขอนัดหมายรอดำเนินการ (${pendingRequests.length})',
                     style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: Color(0xFF1A202C)),
                   ),
                 ],
               ),
               const SizedBox(height: 14.0),
 
-              if (_pendingRequests.isEmpty)
+              if (pendingRequests.isEmpty)
                 const Center(
                   child: Padding(
                     padding: EdgeInsets.all(30.0),
@@ -194,7 +174,7 @@ class _LecturerHomeScreenState extends State<LecturerHomeScreen> {
                   ),
                 )
               else
-                ..._pendingRequests.map((req) {
+                ...pendingRequests.map((req) {
                   return Container(
                     margin: const EdgeInsets.only(bottom: 16.0),
                     padding: const EdgeInsets.all(18.0),
@@ -216,32 +196,32 @@ class _LecturerHomeScreenState extends State<LecturerHomeScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              req['studentName'],
+                              req.studentName,
                               style: const TextStyle(fontSize: 16.5, fontWeight: FontWeight.bold, color: Color(0xFF1A202C)),
                             ),
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFFEEBC8),
+                                color: req.statusBg,
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                              child: const Text('รอตอบรับ', style: TextStyle(color: Color(0xFFDD6B20), fontSize: 12.0, fontWeight: FontWeight.bold)),
+                              child: Text(req.statusText, style: TextStyle(color: req.statusColor, fontSize: 12.0, fontWeight: FontWeight.bold)),
                             ),
                           ],
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          'รหัสนักศึกษา: ${req['studentId']} • ${req['major']}',
+                          'รหัสนักศึกษา: ${req.studentId} • ${req.major}',
                           style: const TextStyle(fontSize: 13.0, color: Color(0xFF718096)),
                         ),
                         const Divider(height: 20, thickness: 0.8),
-                        Text('📌 วัตถุประสงค์: ${req['topic']}', style: const TextStyle(fontSize: 14.0, fontWeight: FontWeight.w600, color: Color(0xFF2D3748))),
+                        Text('📌 วัตถุประสงค์: ${req.topic}', style: const TextStyle(fontSize: 14.0, fontWeight: FontWeight.w600, color: Color(0xFF2D3748))),
                         const SizedBox(height: 6),
                         Row(
                           children: [
                             const Icon(Icons.access_time_rounded, size: 16, color: primaryColor),
                             const SizedBox(width: 6),
-                            Text('${req['date']} • ${req['time']}', style: const TextStyle(fontSize: 13.0, color: Color(0xFF4A5568))),
+                            Text('${req.date} • ${req.time}', style: const TextStyle(fontSize: 13.0, color: Color(0xFF4A5568))),
                           ],
                         ),
                         const SizedBox(height: 16),
@@ -253,7 +233,7 @@ class _LecturerHomeScreenState extends State<LecturerHomeScreen> {
                               child: OutlinedButton(
                                 onPressed: () {
                                   setState(() {
-                                    _pendingRequests.removeWhere((item) => item['id'] == req['id']);
+                                    AppointmentData.rejectAppointment(req.id);
                                   });
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(content: Text('ปฏิเสธ/เลื่อนนัดหมายเรียบร้อยแล้ว')),
@@ -271,12 +251,12 @@ class _LecturerHomeScreenState extends State<LecturerHomeScreen> {
                               child: ElevatedButton(
                                 onPressed: () {
                                   setState(() {
-                                    _pendingRequests.removeWhere((item) => item['id'] == req['id']);
+                                    AppointmentData.approveAppointment(req.id);
                                   });
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
                                       backgroundColor: Color(0xFF38A169),
-                                      content: Text('อนุมัติการนัดหมายเรียบร้อยแล้ว'),
+                                      content: Text('อนุมัติการนัดหมายเรียบร้อยแล้ว! สถานะฝั่งนักศึกษาจะเปลี่ยนเป็นยืนยันแล้วทันที'),
                                     ),
                                   );
                                 },

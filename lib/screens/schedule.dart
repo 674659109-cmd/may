@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:may/models/appointment_data.dart';
 import 'package:may/screens/appointment_detail.dart';
 
 class ScheduleScreen extends StatefulWidget {
@@ -26,6 +27,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> with SingleTickerProvid
   @override
   Widget build(BuildContext context) {
     const primaryColor = Color(0xFF4C52D4);
+    final allList = AppointmentData.appointments;
+    final confirmedList = AppointmentData.appointments.where((a) => a.status == 'CONFIRMED').toList();
+    final pendingList = AppointmentData.appointments.where((a) => a.status == 'PENDING').toList();
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FE),
@@ -47,10 +51,10 @@ class _ScheduleScreenState extends State<ScheduleScreen> with SingleTickerProvid
           indicatorColor: primaryColor,
           indicatorWeight: 3,
           labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-          tabs: const [
-            Tab(text: 'ทั้งหมด (3)'),
-            Tab(text: 'ยืนยันแล้ว (2)'),
-            Tab(text: 'รอดำเนินการ (1)'),
+          tabs: [
+            Tab(text: 'ทั้งหมด (${allList.length})'),
+            Tab(text: 'ยืนยันแล้ว (${confirmedList.length})'),
+            Tab(text: 'รอดำเนินการ (${pendingList.length})'),
           ],
         ),
       ),
@@ -68,51 +72,11 @@ class _ScheduleScreenState extends State<ScheduleScreen> with SingleTickerProvid
   }
 
   Widget _buildAppointmentListView({required String filterStatus}) {
-    final List<Map<String, dynamic>> appointments = [
-      {
-        'title': 'นัดพบอาจารย์ที่ปรึกษา',
-        'person': 'ผศ.ดร.วิศวกรรม นวัตกรรม',
-        'major': 'วิศวกรรมสารสนเทศและการสื่อสาร',
-        'location': 'อาคารวิศวกรรมศาสตร์ ชั้น 3 ห้อง 302',
-        'date': '24 พ.ค. 2567',
-        'time': '10:30 - 11:30 น.',
-        'topic': 'ปรึกษาเรื่องหัวข้อโปรเจกต์ภาคเรียนปัจจุบัน',
-        'status': 'CONFIRMED',
-        'statusText': 'ยืนยันแล้ว',
-        'statusColor': const Color(0xFF38A169),
-        'statusBg': const Color(0xFFC6F6D5),
-      },
-      {
-        'title': 'นัดปรึกษาเรื่องโปรเจกต์',
-        'person': 'อ.ช่างกล ช่างคิด',
-        'major': 'วิศวกรรมสารสนเทศและการสื่อสาร',
-        'location': 'อาคารวิศวกรรมศาสตร์ ชั้น 3 ห้อง 305',
-        'date': '26 พ.ค. 2567',
-        'time': '13:30 - 15:00 น.',
-        'topic': 'ปรึกษาการเขียนโปรแกรม Flutter และระบบเซิร์ฟเวอร์',
-        'status': 'CONFIRMED',
-        'statusText': 'ยืนยันแล้ว',
-        'statusColor': const Color(0xFF38A169),
-        'statusBg': const Color(0xFFC6F6D5),
-      },
-      {
-        'title': 'นัดติวกลุ่มวิชา Mobile App',
-        'person': 'กลุ่มเพื่อนนักศึกษา',
-        'major': 'วิศวกรรมสารสนเทศและการสื่อสาร',
-        'location': 'อาคารโดมเรียนรู้ (Learning Center)',
-        'date': '28 พ.ค. 2567',
-        'time': '13:30 - 15:00 น.',
-        'topic': 'ทบทวนข้อสอบกลางภาควิชา Mobile Application Design',
-        'status': 'PENDING',
-        'statusText': 'รอดำเนินการ',
-        'statusColor': const Color(0xFFDD6B20),
-        'statusBg': const Color(0xFFFEEBC8),
-      },
-    ];
+    final List<AppointmentItem> appointments = AppointmentData.appointments;
 
     final filtered = filterStatus == 'ALL'
         ? appointments
-        : appointments.where((item) => item['status'] == filterStatus).toList();
+        : appointments.where((item) => item.status == filterStatus).toList();
 
     if (filtered.isEmpty) {
       return const Center(
@@ -132,12 +96,27 @@ class _ScheduleScreenState extends State<ScheduleScreen> with SingleTickerProvid
       itemCount: filtered.length,
       itemBuilder: (context, index) {
         final item = filtered[index];
+        final mapItem = {
+          'id': item.id,
+          'title': item.title,
+          'person': item.person,
+          'major': item.major,
+          'location': item.location,
+          'date': item.date,
+          'time': item.time,
+          'topic': item.topic,
+          'status': item.status,
+          'statusText': item.statusText,
+          'statusColor': item.statusColor,
+          'statusBg': item.statusBg,
+        };
+
         return GestureDetector(
           onTap: () {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => AppointmentDetailScreen(appointment: item),
+                builder: (context) => AppointmentDetailScreen(appointment: mapItem),
               ),
             );
           },
@@ -163,7 +142,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> with SingleTickerProvid
                   children: [
                     Expanded(
                       child: Text(
-                        item['title'],
+                        item.title,
                         style: const TextStyle(
                           fontSize: 17.0,
                           fontWeight: FontWeight.bold,
@@ -174,13 +153,13 @@ class _ScheduleScreenState extends State<ScheduleScreen> with SingleTickerProvid
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: item['statusBg'],
+                        color: item.statusBg,
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
-                        item['statusText'],
+                        item.statusText,
                         style: TextStyle(
-                          color: item['statusColor'],
+                          color: item.statusColor,
                           fontSize: 12.0,
                           fontWeight: FontWeight.bold,
                         ),
@@ -194,7 +173,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> with SingleTickerProvid
                     const Icon(Icons.person_outline_rounded, size: 18, color: Color(0xFF718096)),
                     const SizedBox(width: 6),
                     Text(
-                      item['person'],
+                      item.person,
                       style: const TextStyle(fontSize: 14.0, color: Color(0xFF4A5568), fontWeight: FontWeight.w500),
                     ),
                   ],
@@ -206,7 +185,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> with SingleTickerProvid
                     const SizedBox(width: 6),
                     Expanded(
                       child: Text(
-                        item['location'],
+                        item.location,
                         style: const TextStyle(fontSize: 13.5, color: Color(0xFF4A5568)),
                       ),
                     ),
@@ -218,7 +197,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> with SingleTickerProvid
                     const Icon(Icons.access_time_rounded, size: 18, color: Color(0xFF4C52D4)),
                     const SizedBox(width: 6),
                     Text(
-                      '${item['date']} • ${item['time']}',
+                      '${item.date} • ${item.time}',
                       style: const TextStyle(fontSize: 13.5, color: Color(0xFF4A5568)),
                     ),
                   ],

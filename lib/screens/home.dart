@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:may/models/appointment_data.dart';
 import 'package:may/models/user_data.dart';
 import 'package:may/screens/appointment_detail.dart';
 import 'package:may/screens/campus_map.dart';
 import 'package:may/screens/create_appointment.dart';
 import 'package:may/screens/history.dart';
-import 'package:may/screens/login.dart';
 import 'package:may/screens/notifications.dart';
 import 'package:may/screens/profile.dart';
 import 'package:may/screens/room_booking.dart';
@@ -30,11 +30,18 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0.5,
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.school_rounded, color: primaryColor, size: 28),
-            SizedBox(width: 10),
-            Text(
+            Container(
+              padding: const EdgeInsets.all(6.0),
+              decoration: BoxDecoration(
+                color: primaryColor.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.engineering_rounded, color: primaryColor, size: 24),
+            ),
+            const SizedBox(width: 10),
+            const Text(
               'CampusMeet',
               style: TextStyle(
                 color: primaryColor,
@@ -46,7 +53,24 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications_none_rounded, color: Color(0xFF2D3748), size: 26),
+            icon: Stack(
+              children: [
+                const Icon(Icons.notifications_none_rounded, color: Color(0xFF2D3748), size: 26),
+                if (AppointmentData.notifications.any((n) => !n['isRead']))
+                  Positioned(
+                    right: 2,
+                    top: 2,
+                    child: Container(
+                      width: 9,
+                      height: 9,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFE53E3E),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
             onPressed: () {
               Navigator.push(
                 context,
@@ -54,277 +78,18 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
           ),
-          IconButton(
-            icon: const Icon(Icons.logout_rounded, color: Color(0xFFE53E3E)),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  title: const Text('ออกจากระบบ'),
-                  content: const Text('คุณต้องการออกจากระบบหรือไม่?'),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('ยกเลิก', style: TextStyle(color: Colors.grey)),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(builder: (context) => const LoginScreen()),
-                          (route) => false,
-                        );
-                      },
-                      child: const Text('ออกจากระบบ', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
           const SizedBox(width: 8),
         ],
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // User Greeting Banner
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20.0),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF4C52D4), Color(0xFF6B72E1)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(20.0),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF4C52D4).withOpacity(0.3),
-                      blurRadius: 12,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'สวัสดี, ${UserData.name} 👋',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 22.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 6.0),
-                    const Text(
-                      'คณะวิศวกรรมศาสตร์และเทคโนโลยีอุตสาหกรรม มรภ.เพชรบุรี',
-                      style: TextStyle(
-                        color: Color(0xFFE0E5FF),
-                        fontSize: 13.5,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: 16.0),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => const ScheduleScreen()),
-                        );
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 8.0),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(12.0),
-                        ),
-                        child: const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.event_available_rounded, color: Colors.white, size: 18),
-                            SizedBox(width: 8.0),
-                            Text(
-                              'วันนี้มีนัดหมาย 2 รายการ',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14.0,
-                              ),
-                            ),
-                            SizedBox(width: 4.0),
-                            Icon(Icons.arrow_forward_ios_rounded, color: Colors.white, size: 12),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 28.0),
-
-              // Menu Grid Row 1
-              const Text(
-                'เมนูด่วน',
-                style: TextStyle(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1A202C),
-                ),
-              ),
-              const SizedBox(height: 16.0),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _buildMenuItem(
-                    icon: Icons.add_circle_outline_rounded,
-                    title: 'สร้างนัดหมาย',
-                    color: const Color(0xFF4C52D4),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const CreateAppointmentScreen()),
-                      );
-                    },
-                  ),
-                  _buildMenuItem(
-                    icon: Icons.calendar_month_rounded,
-                    title: 'ตารางนัด',
-                    color: const Color(0xFF38A169),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const ScheduleScreen()),
-                      );
-                    },
-                  ),
-                  _buildMenuItem(
-                    icon: Icons.assignment_turned_in_outlined,
-                    title: 'สถานะคำขอ',
-                    color: const Color(0xFFDD6B20),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const ScheduleScreen()),
-                      );
-                    },
-                  ),
-                  _buildMenuItem(
-                    icon: Icons.search_rounded,
-                    title: 'ค้นหาอาจารย์',
-                    color: const Color(0xFF319795),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const SearchLecturerScreen()),
-                      );
-                    },
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16.0),
-
-              // Menu Grid Row 2
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  _buildMenuItem(
-                    icon: Icons.meeting_room_outlined,
-                    title: 'จองห้องแล็บ',
-                    color: const Color(0xFFD69E2E),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const RoomBookingScreen()),
-                      );
-                    },
-                  ),
-                  const SizedBox(width: 24),
-                  _buildMenuItem(
-                    icon: Icons.map_outlined,
-                    title: 'แผนที่อาคาร',
-                    color: const Color(0xFF805AD5),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const CampusMapScreen()),
-                      );
-                    },
-                  ),
-                ],
-              ),
-              const SizedBox(height: 28.0),
-
-              // Upcoming Appointments Section
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'นัดหมายเร็วๆ นี้',
-                    style: TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF1A202C),
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const ScheduleScreen()),
-                      );
-                    },
-                    child: const Text('ดูทั้งหมด', style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold)),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12.0),
-
-              // Appointment Card 1
-              _buildAppointmentCard(
-                context: context,
-                appointment: {
-                  'title': 'นัดพบอาจารย์ที่ปรึกษา',
-                  'person': 'ผศ.ดร.วิศวกรรม นวัตกรรม',
-                  'major': 'วิศวกรรมสารสนเทศและการสื่อสาร',
-                  'location': 'อาคารวิศวกรรมศาสตร์ ชั้น 3 ห้อง 302',
-                  'date': 'วันนี้ (24 พ.ค.)',
-                  'time': '10:30 - 11:30 น.',
-                  'topic': 'ขอปรึกษาหัวข้อโครงงานวิจัยและวิศวกรรมซอฟต์แวร์',
-                  'status': 'CONFIRMED',
-                  'statusText': 'ยืนยันแล้ว',
-                  'statusColor': const Color(0xFF38A169),
-                  'statusBg': const Color(0xFFC6F6D5),
-                },
-              ),
-              const SizedBox(height: 12.0),
-
-              // Appointment Card 2
-              _buildAppointmentCard(
-                context: context,
-                appointment: {
-                  'title': 'นัดติวกลุ่มกับเพื่อน',
-                  'person': 'กลุ่มเพื่อนนักศึกษา',
-                  'major': 'วิศวกรรมสารสนเทศและการสื่อสาร',
-                  'location': 'อาคารโดมเรียนรู้ (Learning Center)',
-                  'date': 'วันนี้ (24 พ.ค.)',
-                  'time': '13:30 - 15:00 น.',
-                  'topic': 'ทบทวนสอบกลางภาควิชา Mobile Application Design',
-                  'status': 'PENDING',
-                  'statusText': 'รอดำเนินการ',
-                  'statusColor': const Color(0xFFDD6B20),
-                  'statusBg': const Color(0xFFFEEBC8),
-                },
-              ),
-            ],
-          ),
+        child: IndexedStack(
+          index: _currentIndex,
+          children: [
+            _buildHomeTab(context),
+            const ScheduleScreen(),
+            const HistoryScreen(),
+            const ProfileScreen(),
+          ],
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -333,43 +98,330 @@ class _HomeScreenState extends State<HomeScreen> {
           setState(() {
             _currentIndex = index;
           });
-          if (index == 1) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const ScheduleScreen()),
-            );
-          } else if (index == 2) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const HistoryScreen()),
-            );
-          } else if (index == 3) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const ProfileScreen()),
-            );
-          }
         },
+        type: BottomNavigationBarType.fixed,
         selectedItemColor: primaryColor,
         unselectedItemColor: const Color(0xFFA0AEC0),
-        type: BottomNavigationBarType.fixed,
+        selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home_filled),
+            icon: Icon(Icons.home_outlined),
+            activeIcon: Icon(Icons.home_rounded),
             label: 'หน้าหลัก',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_today_rounded),
+            icon: Icon(Icons.calendar_today_outlined),
+            activeIcon: Icon(Icons.calendar_today_rounded),
             label: 'ตารางนัด',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.history_rounded),
+            activeIcon: Icon(Icons.history_toggle_off_rounded),
             label: 'ประวัติ',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person_outline_rounded),
+            activeIcon: Icon(Icons.person_rounded),
             label: 'โปรไฟล์',
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHomeTab(BuildContext context) {
+    const primaryColor = Color(0xFF4C52D4);
+    final appointments = AppointmentData.appointments;
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Student Greeting Header
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(20.0),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFF4C52D4), Color(0xFF3B40A4)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(20.0),
+              boxShadow: [
+                BoxShadow(
+                  color: primaryColor.withOpacity(0.3),
+                  blurRadius: 12,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'สวัสดี, ${UserData.name} 👋',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 21.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 4.0),
+                Text(
+                  'รหัสนักศึกษา: ${UserData.studentId} • ${UserData.major}',
+                  style: const TextStyle(
+                    color: Color(0xFFE0E5FF),
+                    fontSize: 13.0,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const Text(
+                  'คณะวิศวกรรมศาสตร์และเทคโนโลยีอุตสาหกรรม มรภ.เพชรบุรี',
+                  style: const TextStyle(
+                    color: Color(0xFFC5CEFF),
+                    fontSize: 12.0,
+                  ),
+                ),
+                const SizedBox(height: 16.0),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const ScheduleScreen()),
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 8.0),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(12.0),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.event_available_rounded, color: Colors.white, size: 18),
+                        const SizedBox(width: 8.0),
+                        Text(
+                          'มีนัดหมายรวม ${appointments.length} รายการ',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13.5,
+                          ),
+                        ),
+                        const SizedBox(width: 4.0),
+                        const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white, size: 12),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 28.0),
+
+          // Menu Grid
+          const Text(
+            'เมนูด่วน',
+            style: TextStyle(
+              fontSize: 18.0,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF1A202C),
+            ),
+          ),
+          const SizedBox(height: 14.0),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _buildMenuItem(
+                icon: Icons.add_circle_outline_rounded,
+                title: 'สร้างนัดหมาย',
+                color: primaryColor,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const CreateAppointmentScreen()),
+                  );
+                },
+              ),
+              _buildMenuItem(
+                icon: Icons.search_rounded,
+                title: 'ค้นหาอาจารย์',
+                color: const Color(0xFF319795),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const SearchLecturerScreen()),
+                  );
+                },
+              ),
+              _buildMenuItem(
+                icon: Icons.meeting_room_outlined,
+                title: 'จองห้องแล็บ',
+                color: const Color(0xFFD69E2E),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const RoomBookingScreen()),
+                  );
+                },
+              ),
+              _buildMenuItem(
+                icon: Icons.map_outlined,
+                title: 'แผนที่อาคาร',
+                color: const Color(0xFF805AD5),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const CampusMapScreen()),
+                  );
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: 28.0),
+
+          // Upcoming Appointments Section
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'นัดหมายเร็วๆ นี้',
+                style: TextStyle(
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF1A202C),
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const ScheduleScreen()),
+                  );
+                },
+                child: const Text('ดูทั้งหมด', style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12.0),
+
+          // Dynamic Appointment Cards
+          ...appointments.map((item) {
+            final mapItem = {
+              'id': item.id,
+              'title': item.title,
+              'person': item.person,
+              'major': item.major,
+              'location': item.location,
+              'date': item.date,
+              'time': item.time,
+              'topic': item.topic,
+              'status': item.status,
+              'statusText': item.statusText,
+              'statusColor': item.statusColor,
+              'statusBg': item.statusBg,
+            };
+
+            return GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AppointmentDetailScreen(appointment: mapItem),
+                  ),
+                );
+              },
+              child: Container(
+                margin: const EdgeInsets.only(bottom: 14.0),
+                padding: const EdgeInsets.all(18.0),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(18.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.04),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            item.title,
+                            style: const TextStyle(
+                              fontSize: 16.5,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF1A202C),
+                            ),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: item.statusBg,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            item.statusText,
+                            style: TextStyle(
+                              color: item.statusColor,
+                              fontSize: 12.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        const Icon(Icons.person_outline_rounded, size: 18, color: Color(0xFF718096)),
+                        const SizedBox(width: 6),
+                        Text(
+                          item.person,
+                          style: const TextStyle(fontSize: 14.0, color: Color(0xFF4A5568), fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ),
+                    const Divider(height: 20, thickness: 0.8),
+                    Row(
+                      children: [
+                        const Icon(Icons.location_on_outlined, size: 18, color: primaryColor),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            item.location,
+                            style: const TextStyle(fontSize: 13.5, color: Color(0xFF4A5568)),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        const Icon(Icons.access_time_rounded, size: 18, color: primaryColor),
+                        const SizedBox(width: 6),
+                        Text(
+                          '${item.date} • ${item.time}',
+                          style: const TextStyle(fontSize: 13.5, color: Color(0xFF4A5568)),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }),
         ],
       ),
     );
@@ -381,123 +433,28 @@ class _HomeScreenState extends State<HomeScreen> {
     required Color color,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        children: [
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.12),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Icon(icon, color: color, size: 28),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 13.0,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF2D3748),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAppointmentCard({
-    required BuildContext context,
-    required Map<String, dynamic> appointment,
-  }) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => AppointmentDetailScreen(appointment: appointment),
-          ),
-        );
-      },
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(16.0),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16.0),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  appointment['title'],
-                  style: const TextStyle(
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF1A202C),
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: appointment['statusBg'],
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    appointment['statusText'],
-                    style: TextStyle(
-                      color: appointment['statusColor'],
-                      fontSize: 12.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 4),
-            Text(
-              appointment['person'],
-              style: const TextStyle(
-                fontSize: 14.0,
-                color: Color(0xFF718096),
+            Container(
+              padding: const EdgeInsets.all(14.0),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(16.0),
               ),
+              child: Icon(icon, color: color, size: 28),
             ),
-            const Divider(height: 24, thickness: 0.8),
-            Row(
-              children: [
-                const Icon(Icons.location_on_outlined, size: 18, color: Color(0xFF4C52D4)),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: Text(
-                    appointment['location'],
-                    style: const TextStyle(fontSize: 13.0, color: Color(0xFF4A5568)),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 6),
-            Row(
-              children: [
-                const Icon(Icons.access_time_rounded, size: 18, color: Color(0xFF4C52D4)),
-                const SizedBox(width: 6),
-                Text(
-                  '${appointment['date']} • ${appointment['time']}',
-                  style: const TextStyle(fontSize: 13.0, color: Color(0xFF4A5568)),
-                ),
-              ],
+            const SizedBox(height: 8.0),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF2D3748),
+              ),
             ),
           ],
         ),
