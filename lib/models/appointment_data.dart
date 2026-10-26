@@ -47,7 +47,7 @@ class AppointmentItem {
 }
 
 class AppointmentData {
-  static final ValueNotifier<List<AppointmentItem>> appointmentsNotifier = ValueNotifier([
+  static final List<AppointmentItem> appointments = [
     AppointmentItem(
       id: '1',
       title: 'นัดพบอาจารย์ที่ปรึกษา',
@@ -74,9 +74,25 @@ class AppointmentData {
       topic: 'ปรึกษาการเขียนโปรแกรม Flutter และระบบเซิร์ฟเวอร์',
       status: 'CONFIRMED',
     ),
-  ]);
+  ];
 
-  static List<AppointmentItem> get appointments => appointmentsNotifier.value;
+  static final List<VoidCallback> _listeners = [];
+
+  static void addListener(VoidCallback listener) {
+    if (!_listeners.contains(listener)) {
+      _listeners.add(listener);
+    }
+  }
+
+  static void removeListener(VoidCallback listener) {
+    _listeners.remove(listener);
+  }
+
+  static void _notifyListeners() {
+    for (var cb in _listeners) {
+      cb();
+    }
+  }
 
   static List<Map<String, dynamic>> notifications = [
     {
@@ -89,13 +105,12 @@ class AppointmentData {
   ];
 
   static void addAppointment(AppointmentItem item) {
-    final updated = List<AppointmentItem>.from(appointmentsNotifier.value);
-    updated.insert(0, item);
-    appointmentsNotifier.value = updated;
+    appointments.insert(0, item);
+    _notifyListeners();
   }
 
   static void approveAppointment(String id) {
-    final updated = appointmentsNotifier.value.map((app) {
+    for (var app in appointments) {
       if (app.id == id) {
         app.status = 'CONFIRMED';
         notifications.insert(0, {
@@ -106,13 +121,12 @@ class AppointmentData {
           'type': 'SUCCESS',
         });
       }
-      return app;
-    }).toList();
-    appointmentsNotifier.value = updated;
+    }
+    _notifyListeners();
   }
 
   static void rejectAppointment(String id) {
-    final updated = appointmentsNotifier.value.map((app) {
+    for (var app in appointments) {
       if (app.id == id) {
         app.status = 'CANCELLED';
         notifications.insert(0, {
@@ -123,8 +137,7 @@ class AppointmentData {
           'type': 'ALERT',
         });
       }
-      return app;
-    }).toList();
-    appointmentsNotifier.value = updated;
+    }
+    _notifyListeners();
   }
 }

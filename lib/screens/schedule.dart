@@ -16,17 +16,26 @@ class _ScheduleScreenState extends State<ScheduleScreen> with SingleTickerProvid
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    AppointmentData.addListener(_onAppointmentsChanged);
   }
 
   @override
   void dispose() {
     _tabController.dispose();
+    AppointmentData.removeListener(_onAppointmentsChanged);
     super.dispose();
+  }
+
+  void _onAppointmentsChanged() {
+    if (mounted) setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     const primaryColor = Color(0xFF4C52D4);
+    final appointments = AppointmentData.appointments;
+    final confirmedList = appointments.where((a) => a.status == 'CONFIRMED').toList();
+    final pendingList = appointments.where((a) => a.status == 'PENDING').toList();
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FE),
@@ -49,25 +58,20 @@ class _ScheduleScreenState extends State<ScheduleScreen> with SingleTickerProvid
           indicatorWeight: 3,
           labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
           tabs: [
-            const Tab(text: 'ทั้งหมด'),
-            const Tab(text: 'ยืนยันแล้ว'),
-            const Tab(text: 'รอดำเนินการ'),
+            Tab(text: 'ทั้งหมด (${appointments.length})'),
+            Tab(text: 'ยืนยันแล้ว (${confirmedList.length})'),
+            Tab(text: 'รอดำเนินการ (${pendingList.length})'),
           ],
         ),
       ),
       body: SafeArea(
-        child: ValueListenableBuilder<List<AppointmentItem>>(
-          valueListenable: AppointmentData.appointmentsNotifier,
-          builder: (context, appointments, child) {
-            return TabBarView(
-              controller: _tabController,
-              children: [
-                _buildAppointmentListView(appointments: appointments, filterStatus: 'ALL'),
-                _buildAppointmentListView(appointments: appointments, filterStatus: 'CONFIRMED'),
-                _buildAppointmentListView(appointments: appointments, filterStatus: 'PENDING'),
-              ],
-            );
-          },
+        child: TabBarView(
+          controller: _tabController,
+          children: [
+            _buildAppointmentListView(appointments: appointments, filterStatus: 'ALL'),
+            _buildAppointmentListView(appointments: appointments, filterStatus: 'CONFIRMED'),
+            _buildAppointmentListView(appointments: appointments, filterStatus: 'PENDING'),
+          ],
         ),
       ),
     );
