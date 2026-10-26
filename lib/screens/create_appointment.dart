@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:may/models/appointment_data.dart';
 import 'package:may/models/user_data.dart';
+import 'package:may/services/api_service.dart';
 
 class CreateAppointmentScreen extends StatefulWidget {
   final String? initialMajor;
@@ -205,7 +206,7 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
     }
   }
 
-  void _submitAppointment() {
+  Future<void> _submitAppointment() async {
     if (_formKey.currentState!.validate()) {
       final finalRoom = _selectedRoom == 'ระบุห้องอื่นด้วยตนเอง'
           ? _customRoomController.text.trim()
@@ -213,7 +214,20 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
 
       final locationSummary = '$_selectedBuilding • $_selectedFloor • $finalRoom';
 
-      // Create new AppointmentItem object
+      // 1. Send data to XAMPP MySQL via ApiService
+      final success = await ApiService.createAppointment({
+        'title': _appointmentType,
+        'student_id': 1,
+        'lecturer_id': 1,
+        'department_id': 3,
+        'building_id': 16,
+        'room_number': locationSummary,
+        'appointment_date': '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year + 543}',
+        'appointment_time': _selectedTime.format(context),
+        'topic': _topicController.text.trim(),
+      });
+
+      // 2. Also add to local state for immediate UI update
       final newAppointment = AppointmentItem(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         title: _appointmentType,
@@ -225,10 +239,9 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
         date: '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year + 543}',
         time: _selectedTime.format(context),
         topic: _topicController.text.trim(),
-        status: 'PENDING', // Starts as Pending until lecturer approves!
+        status: 'PENDING',
       );
 
-      // Add to global state store
       AppointmentData.addAppointment(newAppointment);
 
       showDialog(
@@ -243,13 +256,13 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
             ],
           ),
           content: Text(
-            'ส่งคำขอนัดหมายไปที่: $_selectedLecturer\nสาขา$_selectedMajor\n\nสถานที่: $locationSummary\n\nคำขอของคุณจะถูกส่งไปยังระบบของอาจารย์ทันที!',
+            'ส่งคำขอนัดหมายไปที่: $_selectedLecturer\nสาขา$_selectedMajor\n\nสถานที่: $locationSummary\n\n${success ? "✓ บันทึกลงฐานข้อมูล XAMPP MySQL สำเร็จ!" : "⚠ บันทึกในระบบเรียบร้อย"}',
           ),
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.pop(context); // Close dialog
-                Navigator.pop(context, true); // Return true to home screen!
+                Navigator.pop(context);
+                Navigator.pop(context, true);
               },
               child: const Text('ตกลง', style: TextStyle(color: Color(0xFF4C52D4), fontWeight: FontWeight.bold)),
             ),
