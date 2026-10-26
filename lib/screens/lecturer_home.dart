@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:may/models/appointment_data.dart';
+import 'package:may/models/lecturer_session.dart';
 import 'package:may/screens/login.dart';
 
 class LecturerHomeScreen extends StatefulWidget {
@@ -10,25 +11,18 @@ class LecturerHomeScreen extends StatefulWidget {
 }
 
 class _LecturerHomeScreenState extends State<LecturerHomeScreen> {
-  String _selectedLecturerName = 'ผศ.กฤษณ์ ไชยวงศ์';
-  String _selectedLecturerEmail = 'krit.cha@pbru.ac.th';
-  String _selectedDepartment = 'วิศวกรรมสารสนเทศและการสื่อสาร';
-
-  final List<Map<String, String>> _allLecturers = [
-    {'name': 'ผศ.กฤษณ์ ไชยวงศ์', 'dept': 'วิศวกรรมสารสนเทศและการสื่อสาร', 'email': 'krit.cha@pbru.ac.th'},
-    {'name': 'ผศ.ดร.ช่วงชัย ชุปวา', 'dept': 'วิศวกรรมเครื่องกล', 'email': 'chuangchai.chu@pbru.ac.th'},
-    {'name': 'ผศ.ดร.ปาณิศา แก้วสวัสดิ์', 'dept': 'วิศวกรรมสารสนเทศและการสื่อสาร', 'email': 'panisa.kae@pbru.ac.th'},
-    {'name': 'อ.เจิมธง ปรารถนารักษ์', 'dept': 'วิศวกรรมพลังงาน', 'email': 'jermthong.par@pbru.ac.th'},
-    {'name': 'อ.ประเสริฐ ปราชญ์ประยูร', 'dept': 'วิศวกรรมอุตสาหการ', 'email': 'prasert.pra@pbru.ac.th'},
-    {'name': 'ผศ.วิเชียร เข็มเงิน', 'dept': 'สาขาสถาปัตยกรรมภายใน', 'email': 'wichian.khem@pbru.ac.th'},
-    {'name': 'ผศ.อนุรักษ์ เกษวัฒนากุล', 'dept': 'วิศวกรรมไฟฟ้า', 'email': 'anurak.kas@pbru.ac.th'},
-  ];
+  late String _selectedLecturerName;
+  late String _selectedLecturerEmail;
+  late String _selectedDepartment;
 
   final _emailController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+    _selectedLecturerName = LecturerSession.name;
+    _selectedLecturerEmail = LecturerSession.email;
+    _selectedDepartment = LecturerSession.department;
     _emailController.text = _selectedLecturerEmail;
     AppointmentData.addListener(_onAppointmentsChanged);
   }
@@ -75,10 +69,11 @@ class _LecturerHomeScreenState extends State<LecturerHomeScreen> {
             onPressed: () {
               setState(() {
                 _selectedLecturerEmail = _emailController.text.trim();
+                LecturerSession.email = _selectedLecturerEmail;
               });
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('อัปเดตอีเมลสำหรับอนุมัติเป็น: $_selectedLecturerEmail เรียบร้อย')),
+                SnackBar(content: Text('อัปเดตอีเมลสิทธิ์อาจารย์เป็น: $_selectedLecturerEmail เรียบร้อย')),
               );
             },
             style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF4C52D4)),
@@ -105,11 +100,11 @@ class _LecturerHomeScreenState extends State<LecturerHomeScreen> {
             Icon(Icons.engineering_rounded, color: primaryColor, size: 28),
             SizedBox(width: 10),
             Text(
-              'CampusMeet (อาจารย์)',
+              'CampusMeet (ระบบอาจารย์ 32 ท่าน)',
               style: TextStyle(
                 color: primaryColor,
                 fontWeight: FontWeight.bold,
-                fontSize: 20,
+                fontSize: 18,
               ),
             ),
           ],
@@ -154,7 +149,7 @@ class _LecturerHomeScreenState extends State<LecturerHomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // LECTURER SWITCHER & EMAIL CONFIG CARD
+              // LECTURER SWITCHER & EMAIL CONFIG CARD (All 32 Faculty Members)
               Container(
                 padding: const EdgeInsets.all(16.0),
                 decoration: BoxDecoration(
@@ -173,7 +168,7 @@ class _LecturerHomeScreenState extends State<LecturerHomeScreen> {
                         Icon(Icons.admin_panel_settings_rounded, color: primaryColor, size: 20),
                         SizedBox(width: 8),
                         Text(
-                          'สลับผู้มีอำนาจอนุมัติ (อาจารย์ผู้พิจารณา)',
+                          'เลือกอาจารย์ผู้พิจารณา (ครบทั้ง 32 ท่าน มรภ.เพชรบุรี)',
                           style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.bold, color: Color(0xFF1A202C)),
                         ),
                       ],
@@ -188,7 +183,7 @@ class _LecturerHomeScreenState extends State<LecturerHomeScreen> {
                         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
                       ),
-                      items: _allLecturers.map((lec) {
+                      items: LecturerSession.allFaculty.map((lec) {
                         return DropdownMenuItem<String>(
                           value: lec['name'],
                           child: Text('${lec['name']} (${lec['dept']})', style: const TextStyle(fontSize: 13), overflow: TextOverflow.ellipsis),
@@ -196,11 +191,14 @@ class _LecturerHomeScreenState extends State<LecturerHomeScreen> {
                       }).toList(),
                       onChanged: (val) {
                         if (val != null) {
-                          final found = _allLecturers.firstWhere((l) => l['name'] == val);
+                          final found = LecturerSession.allFaculty.firstWhere((l) => l['name'] == val);
                           setState(() {
                             _selectedLecturerName = found['name']!;
                             _selectedDepartment = found['dept']!;
                             _selectedLecturerEmail = found['email']!;
+                            LecturerSession.name = _selectedLecturerName;
+                            LecturerSession.department = _selectedDepartment;
+                            LecturerSession.email = _selectedLecturerEmail;
                           });
                         }
                       },
@@ -211,7 +209,7 @@ class _LecturerHomeScreenState extends State<LecturerHomeScreen> {
                       children: [
                         Expanded(
                           child: Text(
-                            '📧 อีเมลอนุมัติ: $_selectedLecturerEmail',
+                            '📧 อีเมลยืนยันตัวตน: $_selectedLecturerEmail',
                             style: const TextStyle(fontSize: 13, color: Color(0xFF4A5568), fontWeight: FontWeight.w600),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -261,7 +259,7 @@ class _LecturerHomeScreenState extends State<LecturerHomeScreen> {
                     ),
                     const SizedBox(height: 4.0),
                     Text(
-                      'ประธาน/อาจารย์ประจำสาขา$_selectedDepartment',
+                      'อาจารย์ประจำสาขา$_selectedDepartment',
                       style: const TextStyle(
                         color: Color(0xFFE0E5FF),
                         fontSize: 13.5,
@@ -383,7 +381,7 @@ class _LecturerHomeScreenState extends State<LecturerHomeScreen> {
                           children: [
                             const Icon(Icons.email_outlined, size: 16, color: primaryColor),
                             const SizedBox(width: 6),
-                            Text('ผู้พิจารณา: $_selectedLecturerName ($_selectedLecturerEmail)', style: const TextStyle(fontSize: 12.5, color: Color(0xFF718096))),
+                            Text('ผู้พิจารณาอนุมัติ: $_selectedLecturerName ($_selectedLecturerEmail)', style: const TextStyle(fontSize: 12.5, color: Color(0xFF718096))),
                           ],
                         ),
                         const SizedBox(height: 16),
@@ -418,7 +416,7 @@ class _LecturerHomeScreenState extends State<LecturerHomeScreen> {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       backgroundColor: const Color(0xFF38A169),
-                                      content: Text('อนุมัติโดย $_selectedLecturerName ($_selectedLecturerEmail) สำเร็จ!'),
+                                      content: Text('อนุมัติโดยอาจารย์ $_selectedLecturerName ($_selectedLecturerEmail) เรียบร้อยแล้ว!'),
                                     ),
                                   );
                                 },

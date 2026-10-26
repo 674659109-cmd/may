@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:may/models/lecturer_session.dart';
 import 'package:may/screens/lecturer_home.dart';
 
 class LecturerLoginFormScreen extends StatefulWidget {
@@ -23,10 +24,26 @@ class _LecturerLoginFormScreenState extends State<LecturerLoginFormScreen> {
 
   void _handleLecturerLogin() {
     if (_formKey.currentState!.validate()) {
+      final emailInput = _emailController.text.trim().toLowerCase();
+
+      // Match against official PBRU Engineering Faculty members (all 32 faculty members)
+      final matchedFaculty = LecturerSession.allFaculty.firstWhere(
+        (f) => f['email']!.toLowerCase() == emailInput,
+        orElse: () => {
+          'name': 'อาจารย์ (บุคลากรคณะวิศวกรรมศาสตร์ฯ)',
+          'dept': 'วิศวกรรมศาสตร์และเทคโนโลยีอุตสาหกรรม',
+          'email': emailInput,
+        },
+      );
+
+      LecturerSession.name = matchedFaculty['name']!;
+      LecturerSession.email = matchedFaculty['email']!;
+      LecturerSession.department = matchedFaculty['dept']!;
+
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          backgroundColor: Color(0xFF38A169),
-          content: Text('เข้าสู่ระบบสิทธิอาจารย์สำเร็จ', style: TextStyle(fontWeight: FontWeight.bold)),
+        SnackBar(
+          backgroundColor: const Color(0xFF38A169),
+          content: Text('เข้าสู่ระบบสำเร็จ: ${LecturerSession.name} (${LecturerSession.email})', style: const TextStyle(fontWeight: FontWeight.bold)),
         ),
       );
 
